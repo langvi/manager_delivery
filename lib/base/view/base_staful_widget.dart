@@ -54,7 +54,7 @@ abstract class BaseStatefulWidgetState<SF extends StatefulWidget,
     // showPopup.showDialogNotification(error.toString());
   }
 
-  Widget baseShowLoading(Widget child) {
+  Widget baseShowLoading({@required Widget child}) {
     return Stack(
       children: [
         child,

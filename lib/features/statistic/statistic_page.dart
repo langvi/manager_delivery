@@ -14,7 +14,6 @@ class _StatisticPageState extends State<StatisticPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        // title: Text('Thống kê'),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [Text('Thống kê'), BaseWidget.buildLogout(context)],

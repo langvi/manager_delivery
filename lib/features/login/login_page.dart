@@ -14,8 +14,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends BaseStatefulWidgetState<LoginPage, LoginBloc> {
-  TextEditingController userNameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  TextEditingController userNameController = TextEditingController(text: 'test1');
+  TextEditingController passwordController = TextEditingController(text: '123456');
   final _userNameFocus = FocusNode();
   final _passwordFocus = FocusNode();
   final _formKey = GlobalKey<FormState>();
@@ -29,9 +29,17 @@ class _LoginPageState extends BaseStatefulWidgetState<LoginPage, LoginBloc> {
     return BlocProvider<LoginBloc>(
       create: (context) => bloc,
       child: BlocConsumer<LoginBloc, LoginState>(
-        listener: (context, state) {},
+        listener: (context, state) {
+          if (state is LoginSuccess) {
+            print('login sucess');
+            Navigator.pushNamed(context, AppConst.routeHome);
+          } else if (state is LoginError) {
+            print('login error');
+          }
+        },
         builder: (context, state) {
           return Scaffold(
+            resizeToAvoidBottomInset: false,
             body: _buildBody(),
           );
         },
@@ -48,10 +56,7 @@ class _LoginPageState extends BaseStatefulWidgetState<LoginPage, LoginBloc> {
             height: 40,
           ),
           Container(
-            height: 100,
-            width: double.infinity,
-            color: Colors.green,
-            child: Center(child: Text('Logo')),
+            child: Center(child: Image.asset('assets/images/logo_app.png')),
             // child: Image.asset('assets/images/logo_login.png'),
           ),
           Form(
@@ -112,6 +117,7 @@ class _LoginPageState extends BaseStatefulWidgetState<LoginPage, LoginBloc> {
                       child: RaisedButton(
                         onPressed: () {
                           if (_formKey.currentState.validate()) {
+                            // bloc.add(Login(userNameController.text, ''));
                             Navigator.pushNamed(context, AppConst.routeHome);
                           }
                         },
