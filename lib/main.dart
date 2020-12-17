@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:manage_delivery/features/manager_product/add_address/add_address_page.dart';
+import 'package:manage_delivery/features/manager_product/create_product/create_product_page.dart';
 
 import 'base/consts/const.dart';
 import 'features/home/home_page.dart';
@@ -46,6 +48,10 @@ class _MyAppState extends State<MyApp> {
     switch (routeName) {
       case AppConst.routeHome:
         return HomePage();
+      case AppConst.routeCreateProduct:
+        return CreateProductPage();
+      case AppConst.routeCreateAddress:
+        return AddressPage();
     }
     return null;
   }

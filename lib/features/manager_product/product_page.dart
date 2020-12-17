@@ -6,6 +6,8 @@ import 'package:manage_delivery/features/manager_product/bloc/product_bloc.dart'
 import 'package:manage_delivery/features/manager_product/model/product_response.dart';
 import 'package:manage_delivery/utils/input_text.dart';
 
+import '../../base/consts/const.dart';
+
 class ProductPage extends StatefulWidget {
   ProductPage({Key key}) : super(key: key);
 
@@ -20,7 +22,7 @@ class _ProductPageState
   @override
   void initBloc() {
     bloc = ProductBloc();
-    bloc.add(GetAllProduct());
+    // bloc.add(GetAllProduct());
   }
 
   @override
@@ -61,7 +63,7 @@ class _ProductPageState
         children: [
           _buildGeneral(),
           _buildSearchInput(),
-          Expanded(child: _buildListProduct())
+          // Expanded(child: _buildListProduct())
         ],
       ),
     );
@@ -71,14 +73,20 @@ class _ProductPageState
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Card(
-          color: Colors.orange,
-          child: Container(
-            width: 100,
-            height: 120,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [Text('Đang lấy'), Icon(Icons.photo_rounded)],
+        GestureDetector(
+          onTap: () {
+            Navigator.pushNamed(context, AppConst.routeCreateProduct);
+          },
+          child: Card(
+            elevation: 10,
+            color: Colors.orange[600],
+            child: Container(
+              width: 100,
+              height: 120,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [Text('Tạo đơn hàng'), Icon(Icons.add)],
+              ),
             ),
           ),
         ),
@@ -119,19 +127,19 @@ class _ProductPageState
     );
   }
 
-  Widget _buildListProduct() {
-    return ListView.separated(
-      itemCount: products.length,
-      separatorBuilder: (context, index) {
-        return Divider(
-          color: Colors.grey,
-          indent: 10,
-          endIndent: 10,
-        );
-      },
-      itemBuilder: (context, index) {
-        return ListTile(title: Text(products[index].nameProduct));
-      },
-    );
-  }
+  // Widget _buildListProduct() {
+  //   return ListView.separated(
+  //     itemCount: products.length,
+  //     separatorBuilder: (context, index) {
+  //       return Divider(
+  //         color: Colors.grey,
+  //         indent: 10,
+  //         endIndent: 10,
+  //       );
+  //     },
+  //     itemBuilder: (context, index) {
+  //       return ListTile(title: Text(products[index].nameProduct));
+  //     },
+  //   );
+  // }
 }
