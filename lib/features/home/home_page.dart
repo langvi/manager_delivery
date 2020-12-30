@@ -28,6 +28,7 @@ class _HomePageState extends State<HomePage> {
         body: SafeArea(
           child: Container(
             child: PageView(
+              physics: NeverScrollableScrollPhysics(),
               controller: _pageController,
               onPageChanged: onTabChange,
               children: [

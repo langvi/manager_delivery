@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:manage_delivery/features/manager_product/add_address/add_address_page.dart';
+import 'package:manage_delivery/features/manager_customer/detail_customer/detail_customer_page.dart';
+import 'package:manage_delivery/features/manager_product/address/address_page.dart';
 import 'package:manage_delivery/features/manager_product/create_product/create_product_page.dart';
+import 'package:manage_delivery/features/manager_product/detail_product/detail_product_page.dart';
+import 'package:manage_delivery/utils/key_board.dart';
 
 import 'base/consts/const.dart';
 import 'features/home/home_page.dart';
@@ -18,12 +21,17 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Manager Delivery',
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-      onGenerateRoute: (setting) => _onGenerateRoute(setting),
-      home: LoginPage(),
+    return GestureDetector(
+      onTap: () {
+        hideKeyboard(context);
+      },
+      child: MaterialApp(
+        title: 'Manager Delivery',
+        debugShowCheckedModeBanner: false,
+        initialRoute: '/',
+        onGenerateRoute: (setting) => _onGenerateRoute(setting),
+        home: LoginPage(),
+      ),
     );
   }
 
@@ -52,6 +60,10 @@ class _MyAppState extends State<MyApp> {
         return CreateProductPage();
       case AppConst.routeCreateAddress:
         return AddressPage();
+      case AppConst.routeDetailProduct:
+        return DetailProductPage();
+      case AppConst.routeDetailCustomer:
+        return DetailCustomerPage();
     }
     return null;
   }

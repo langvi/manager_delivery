@@ -41,10 +41,16 @@ class _CreateProductPageState
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
               leading: BackButton(
+                color: Colors.black,
                 onPressed: () => Navigator.pop(context),
               ),
-              title: Text('Tạo đơn hàng'),
+              title: Text(
+                'Tạo đơn hàng',
+                style: TextStyle(color: Colors.black),
+              ),
               centerTitle: true,
             ),
             body: Stack(children: [
@@ -116,15 +122,18 @@ class _CreateProductPageState
   }
 
   Widget _buildButton() {
-    return RaisedButton(
-      color: AppColors.mainColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      onPressed: () {
-        Navigator.pushNamed(context, AppConst.routeCreateAddress);
-      },
-      child: Text(
-        'TIẾP TỤC',
-        style: TextStyle(color: Colors.white),
+    return Container(
+      height: 50,
+      child: RaisedButton(
+        color: AppColors.mainColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        onPressed: () {
+          Navigator.pushNamed(context, AppConst.routeCreateAddress);
+        },
+        child: Text(
+          'TIẾP TỤC',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
     );
   }

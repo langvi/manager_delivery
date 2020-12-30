@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/view/base_staful_widget.dart';
-import 'package:manage_delivery/features/manager_product/add_address/bloc/address_bloc.dart';
+import 'package:manage_delivery/features/manager_product/address/bloc/address_bloc.dart';
 import 'package:manage_delivery/utils/input_text.dart';
+import 'package:manage_delivery/utils/style_text.dart';
 
 class AddressPage extends StatefulWidget {
   AddressPage({Key key}) : super(key: key);
@@ -19,7 +20,10 @@ class _AddressPageState
   TextEditingController detailAddressCtr = TextEditingController();
   final _nameFocus = FocusNode();
   final _phoneFocus = FocusNode();
-  List<String> provinces = ['Hà Nội'];
+  String title = 'Thêm địa chỉ người';
+  String enterName = 'Nhập tên người';
+  bool isSend = true;
+  List<String> provinces = ['Hà Nội', 'Lạng Sơn', 'Bắc Ninh', 'Thái Nguyên'];
   @override
   void initBloc() {
     bloc = AddressBloc();
@@ -35,10 +39,16 @@ class _AddressPageState
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(
+              elevation: 0,
+              backgroundColor: Colors.white,
               leading: BackButton(
+                color: Colors.black,
                 onPressed: () => Navigator.pop(context),
               ),
-              title: Text('Thêm địa chỉ người nhận'),
+              title: Text(
+                getTitle(title),
+                style: StyleText.appBarStyle,
+              ),
               centerTitle: true,
             ),
             body: Padding(
@@ -55,7 +65,7 @@ class _AddressPageState
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 5),
                         child: BuildTextInput(
-                          hintText: 'Nhập tên người nhận',
+                          hintText: getTitle(enterName),
                           controller: nameReceiveController,
                           currentNode: _nameFocus,
                           nextNode: _phoneFocus,
@@ -144,16 +154,26 @@ class _AddressPageState
   }
 
   Widget _buildButton() {
-    return RaisedButton(
-      color: AppColors.mainColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      onPressed: () {
-        // Navigator.pushNamed(context, AppConst.routeCreateAddress);
-      },
-      child: Text(
-        'LƯU',
-        style: TextStyle(color: Colors.white),
+    return Container(
+      height: 50,
+      child: RaisedButton(
+        color: AppColors.mainColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        onPressed: () {
+          setState(() {
+            isSend = false;
+          });
+          // Navigator.pushNamed(context, AppConst.routeCreateAddress);
+        },
+        child: Text(
+          isSend ? 'TIẾP TỤC' : 'LƯU',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
     );
+  }
+
+  String getTitle(String content) {
+    return isSend ? content + ' gửi' : content + ' nhận';
   }
 }
