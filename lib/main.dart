@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:manage_delivery/features/manager_customer/detail_customer/detail_customer_page.dart';
+import 'package:manage_delivery/features/manager_employee/detail_employee/detail_employee_page.dart';
 import 'package:manage_delivery/features/manager_product/address/address_page.dart';
 import 'package:manage_delivery/features/manager_product/create_product/create_product_page.dart';
 import 'package:manage_delivery/features/manager_product/detail_product/detail_product_page.dart';
@@ -64,6 +65,8 @@ class _MyAppState extends State<MyApp> {
         return DetailProductPage();
       case AppConst.routeDetailCustomer:
         return DetailCustomerPage();
+      case AppConst.routeDetailShipper:
+        return DetailEmployeePage();
     }
     return null;
   }

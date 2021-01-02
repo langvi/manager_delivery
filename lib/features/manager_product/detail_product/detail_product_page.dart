@@ -29,6 +29,7 @@ class _DetailProductPageState
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(
+              backgroundColor: AppColors.mainColor,
               leading: BackButton(
                 onPressed: () => Navigator.pop(context),
               ),

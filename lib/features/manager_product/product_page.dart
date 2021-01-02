@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/view/base_staful_widget.dart';
@@ -49,19 +50,20 @@ class _ProductPageState
         builder: (context, state) {
           return baseShowLoading(
             child: Scaffold(
+              backgroundColor: Colors.grey[200],
               appBar: AppBar(
-                backgroundColor: Colors.white,
+                backgroundColor: AppColors.mainColor,
                 elevation: 0,
                 automaticallyImplyLeading: false,
                 title: Text(
                   'Quản lí hàng hóa',
-                  style: TextStyle(color: Colors.black),
+                  style: TextStyle(color: Colors.white),
                 ),
                 actions: [
                   IconButton(
                       icon: Icon(
-                        Icons.more_vert,
-                        color: Colors.black,
+                        Icons.search,
+                        color: Colors.white,
                       ),
                       onPressed: () {})
                 ],
@@ -75,17 +77,95 @@ class _ProductPageState
   }
 
   Widget _buildBody() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+    return SingleChildScrollView(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSearchInput(),
-          const SizedBox(
-            height: 10,
+          _buildHeader(),
+          SizedBox(
+            height: 5,
           ),
-
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Text(
+              'Danh sách đơn hàng',
+              style: TextStyle(
+                  color: AppColors.mainColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
           // _buildGeneral(),
           _buildListProduct()
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Card(
+      elevation: 5,
+      margin: EdgeInsets.all(0),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20))),
+      color: Colors.white,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Expanded(child: _buildItem('Tất cả ', 120, AppColors.gradientAll)),
+            SizedBox(
+              width: 5,
+            ),
+            Expanded(
+                child:
+                    _buildItem('Đang lấy', 11, AppColors.gradientGetProduct)),
+            SizedBox(
+              width: 5,
+            ),
+            Expanded(
+                child:
+                    _buildItem('Đang giao', 100, AppColors.gradientShipping)),
+            SizedBox(
+              width: 5,
+            ),
+            Expanded(
+                child: _buildItem('Đã giao', 9, AppColors.gradientShipped)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildItem(String title, int value, List<Color> colors) {
+    return Container(
+      padding: EdgeInsets.all(10),
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(5),
+            decoration: BoxDecoration(
+                gradient: LinearGradient(colors: colors),
+                borderRadius: BorderRadius.circular(10)),
+            child: SvgPicture.asset(
+              'assets/images/product.svg',
+              height: 40,
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            title,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text('$value')
         ],
       ),
     );
@@ -160,59 +240,119 @@ class _ProductPageState
   }
 
   Widget _buildListProduct() {
-    return ListView.separated(
-      itemCount: products.length,
-      shrinkWrap: true,
-      separatorBuilder: (context, index) {
-        return Divider(
-          color: Colors.grey,
-        );
-      },
-      itemBuilder: (context, index) {
-        // return ListTile(title: Text(products[index].nameProduct));
-        return _buildItemProduct(index);
-      },
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: ListView.builder(
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: 10,
+        itemBuilder: (context, index) {
+          return _buildItemProduct(index);
+        },
+      ),
     );
   }
 
   Widget _buildItemProduct(int index) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, AppConst.routeDetailProduct);
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, AppConst.routeDetailProduct);
+        },
+        child: Container(
+          padding: EdgeInsets.all(10),
+          child: Row(
             children: [
-              Text(
-                'Mã đơn hàng: ${products[index].id}',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(products[index].createdAt),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            child: Text('Người gửi: ${products[index].sendFrom}'),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Địa chỉ: ${products[index].address}'),
               Container(
-                  padding: EdgeInsets.all(3),
+                  padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.blue),
-                  child: Text(
-                    getStatus(products[index].status),
-                    style: TextStyle(color: Colors.white),
+                      gradient: LinearGradient(
+                          colors: [Colors.blue[700], Colors.blue[300]]),
+                      shape: BoxShape.circle),
+                  child: SvgPicture.asset(
+                    'assets/images/product.svg',
+                    height: 40,
                   )),
+              SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                              text: 'Mã đơn hàng: ',
+                              style: TextStyle(color: Colors.black),
+                              children: [
+                                TextSpan(
+                                  text: '5efefe5',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                )
+                              ]),
+                        ),
+                        Text('20/12/2021'),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          RichText(
+                            text: TextSpan(
+                                text: 'Người gửi: ',
+                                style: TextStyle(color: Colors.black),
+                                children: [
+                                  TextSpan(
+                                    text: 'Hoa',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  )
+                                ]),
+                          ),
+                          Text('12:02')
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: RichText(
+                            text: TextSpan(
+                                text: 'Địa chỉ: ',
+                                style: TextStyle(color: Colors.black),
+                                children: [
+                                  TextSpan(
+                                    text: 'Hoa Bằng, Cầu Giấy, Hà Nội',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  )
+                                ]),
+                          ),
+                        ),
+                        Container(
+                            padding: EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.blue),
+                            child: Text(
+                              'fefe',
+                              style: TextStyle(color: Colors.white),
+                            )),
+                      ],
+                    )
+                  ],
+                ),
+              ),
             ],
-          )
-        ],
+          ),
+        ),
       ),
     );
   }
