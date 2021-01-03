@@ -6,6 +6,7 @@ import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/view/base_staful_widget.dart';
 import 'package:manage_delivery/features/manager_product/bloc/product_bloc.dart';
 import 'package:manage_delivery/features/manager_product/model/product_response.dart';
+import 'package:manage_delivery/utils/dropdown_widget.dart';
 import 'package:manage_delivery/utils/input_text.dart';
 
 import '../../base/consts/const.dart';
@@ -24,6 +25,8 @@ class _ProductPageState
   TextEditingController searchController = TextEditingController();
   // TabController _tabController;
   // int currentPage = 0;
+  String currentValue = 'Tất cả';
+  List<String> values = ['Tất cả', 'Đống Đa'];
   @override
   void initBloc() {
     bloc = ProductBloc();
@@ -65,7 +68,8 @@ class _ProductPageState
                         Icons.search,
                         color: Colors.white,
                       ),
-                      onPressed: () {})
+                      onPressed: () {}),
+                  _popUpMenu()
                 ],
               ),
               body: _buildBody(),
@@ -87,12 +91,17 @@ class _ProductPageState
           ),
           Padding(
             padding: const EdgeInsets.all(10),
-            child: Text(
-              'Danh sách đơn hàng',
-              style: TextStyle(
-                  color: AppColors.mainColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Danh sách đơn hàng',
+                  style: TextStyle(
+                      color: AppColors.mainColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
           ),
           // _buildGeneral(),
@@ -355,6 +364,61 @@ class _ProductPageState
         ),
       ),
     );
+  }
+
+  Widget _popUpMenu() {
+    return PopupMenuButton(onSelected: (value) {
+      if (value == 1) {
+        Navigator.pushNamed(context, AppConst.routeEnterProduct);
+      } else {
+        Navigator.pushNamed(context, AppConst.routeCreateProduct);
+      }
+    }, itemBuilder: (context) {
+      var list = List<PopupMenuEntry<Object>>();
+      list.add(
+        PopupMenuItem(
+          value: 1,
+          child: Row(
+            children: [
+              Icon(
+                AntDesign.qrcode,
+                color: Colors.black,
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              Text("Nhập hàng"),
+            ],
+          ),
+        ),
+      );
+      list.add(
+        PopupMenuDivider(
+          height: 10,
+        ),
+      );
+      list.add(
+        PopupMenuItem(
+          value: 2,
+          child: Row(
+            children: [
+              Icon(
+                AntDesign.edit,
+                color: Colors.blue,
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              Text(
+                "Tạo đơn hàng",
+                style: TextStyle(color: Colors.blue),
+              ),
+            ],
+          ),
+        ),
+      );
+      return list;
+    });
   }
 
   String getStatus(int status) {

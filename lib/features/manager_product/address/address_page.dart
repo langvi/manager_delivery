@@ -51,83 +51,83 @@ class _AddressPageState
               ),
               centerTitle: true,
             ),
-            body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              child: Stack(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Địa chỉ giao hàng',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5),
-                        child: BuildTextInput(
-                          hintText: getTitle(enterName),
-                          controller: nameReceiveController,
-                          currentNode: _nameFocus,
-                          nextNode: _phoneFocus,
-                          isBorder: true,
-                          filledColor: Colors.white,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5),
-                        child: BuildTextInput(
-                          hintText: 'Nhập số điện thoại',
-                          controller: phoneController,
-                          currentNode: _phoneFocus,
-                          obscureText: true,
-                          isBorder: true,
-                          filledColor: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                              child: _buildDropDown('Chọn tỉnh', ['Hà Nội'])),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                              child: _buildDropDown(
-                                  'Chọn quận(huyện)', ['Hai Bà Trưng'])),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: _buildDropDown('Chọn phường(xã)', ['Bách Khoa']),
-                      ),
-                      TextFormField(
-                        controller: detailAddressCtr,
-                        keyboardType: TextInputType.multiline,
-                        maxLines: 3,
-                        style: TextStyle(fontSize: 19),
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            contentPadding: const EdgeInsets.only(
-                                left: 5, right: 5, top: 10, bottom: 10),
-                            hintText: 'Nhập địa chỉ chi tiết',
-                            hintStyle:
-                                TextStyle(color: Colors.black54, fontSize: 14)),
-                      )
-                    ],
-                  ),
-                  Positioned(
-                      left: 0, right: 0, bottom: 5, child: _buildButton())
-                ],
-              ),
+            body: Column(
+              children: [Expanded(child: _buildBody()), _buildButton()],
             ),
           );
         },
       ),
     ));
+  }
+
+  Widget _buildBody() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Địa chỉ giao hàng',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: BuildTextInput(
+                hintText: getTitle(enterName),
+                controller: nameReceiveController,
+                currentNode: _nameFocus,
+                nextNode: _phoneFocus,
+                isBorder: true,
+                filledColor: Colors.white,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: BuildTextInput(
+                hintText: 'Nhập số điện thoại',
+                controller: phoneController,
+                currentNode: _phoneFocus,
+                obscureText: true,
+                isBorder: true,
+                filledColor: Colors.white,
+              ),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Row(
+              children: [
+                Expanded(child: _buildDropDown('Chọn tỉnh', ['Hà Nội'])),
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                    child:
+                        _buildDropDown('Chọn quận(huyện)', ['Hai Bà Trưng'])),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: _buildDropDown('Chọn phường(xã)', ['Bách Khoa']),
+            ),
+            TextFormField(
+              controller: detailAddressCtr,
+              keyboardType: TextInputType.multiline,
+              maxLines: 3,
+              style: TextStyle(fontSize: 19),
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  contentPadding: const EdgeInsets.only(
+                      left: 5, right: 5, top: 10, bottom: 10),
+                  hintText: 'Nhập địa chỉ chi tiết',
+                  hintStyle: TextStyle(color: Colors.black54, fontSize: 14)),
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildDropDown(String title, List<String> listAddress) {
@@ -154,20 +154,24 @@ class _AddressPageState
   }
 
   Widget _buildButton() {
-    return Container(
-      height: 50,
-      child: RaisedButton(
-        color: AppColors.mainColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        onPressed: () {
-          setState(() {
-            isSend = false;
-          });
-          // Navigator.pushNamed(context, AppConst.routeCreateAddress);
-        },
-        child: Text(
-          isSend ? 'TIẾP TỤC' : 'LƯU',
-          style: TextStyle(color: Colors.white),
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Container(
+        height: 50,
+        width: double.infinity,
+        child: RaisedButton(
+          color: AppColors.mainColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          onPressed: () {
+            setState(() {
+              isSend = false;
+            });
+            // Navigator.pushNamed(context, AppConst.routeCreateAddress);
+          },
+          child: Text(
+            isSend ? 'TIẾP TỤC' : 'LƯU',
+            style: TextStyle(color: Colors.white),
+          ),
         ),
       ),
     );

@@ -41,22 +41,21 @@ class _CreateProductPageState
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.mainColor,
               elevation: 0,
               leading: BackButton(
-                color: Colors.black,
+                color: Colors.white,
                 onPressed: () => Navigator.pop(context),
               ),
               title: Text(
                 'Tạo đơn hàng',
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Colors.white),
               ),
               centerTitle: true,
             ),
-            body: Stack(children: [
-              _buildBody(),
-              Positioned(left: 10, right: 10, bottom: 5, child: _buildButton())
-            ]),
+            body: Column(
+              children: [Expanded(child: _buildBody()), _buildButton()],
+            ),
           );
         },
       ),
@@ -64,75 +63,86 @@ class _CreateProductPageState
   }
 
   Widget _buildBody() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: BuildTextInput(
-            hintText: 'Nhập tên hàng hóa',
-            controller: nameController,
-            currentNode: _nameFocus,
-            nextNode: _costFocus,
-            isBorder: true,
-            filledColor: Colors.white,
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: BuildTextInput(
+              hintText: 'Nhập tên hàng hóa',
+              controller: nameController,
+              currentNode: _nameFocus,
+              nextNode: _costFocus,
+              isBorder: true,
+              filledColor: Colors.white,
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: BuildTextInput(
-            hintText: 'Nhập số tiền cần thu',
-            obscureText: true,
-            currentNode: _costFocus,
-            nextNode: _cODFocus,
-            controller: costController,
-            isBorder: true,
-            filledColor: Colors.white,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: BuildTextInput(
+              hintText: 'Nhập số tiền cần thu',
+              obscureText: true,
+              currentNode: _costFocus,
+              nextNode: _cODFocus,
+              controller: costController,
+              isBorder: true,
+              filledColor: Colors.white,
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: BuildTextInput(
-            hintText: 'Nhập giá vận chuyển',
-            controller: cODController,
-            currentNode: _cODFocus,
-            nextNode: _noteFocus,
-            isBorder: true,
-            filledColor: Colors.white,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: BuildTextInput(
+              hintText: 'Nhập giá vận chuyển',
+              controller: cODController,
+              currentNode: _cODFocus,
+              nextNode: _noteFocus,
+              isBorder: true,
+              filledColor: Colors.white,
+            ),
           ),
-        ),
-        _buildCount(),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextFormField(
-            controller: noteController,
-            keyboardType: TextInputType.multiline,
-            maxLines: 3,
-            style: TextStyle(fontSize: 19),
-            decoration: InputDecoration(
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                contentPadding: const EdgeInsets.only(
-                    left: 12, right: 12, top: 6, bottom: 40),
-                hintText: 'Ghi chú',
-                hintStyle: TextStyle(color: Colors.grey, fontSize: 14)),
+          _buildCount(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextFormField(
+              controller: noteController,
+              keyboardType: TextInputType.multiline,
+              maxLines: 3,
+              style: TextStyle(fontSize: 19),
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  contentPadding: const EdgeInsets.only(
+                      left: 12, right: 12, top: 6, bottom: 40),
+                  hintText: 'Ghi chú',
+                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14)),
+            ),
           ),
-        )
-      ],
+
+          // Padding(
+          //   padding: const EdgeInsets.all(10.0),
+          //   child: _buildButton(),
+          // )
+        ],
+      ),
     );
   }
 
   Widget _buildButton() {
-    return Container(
-      height: 50,
-      child: RaisedButton(
-        color: AppColors.mainColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        onPressed: () {
-          Navigator.pushNamed(context, AppConst.routeCreateAddress);
-        },
-        child: Text(
-          'TIẾP TỤC',
-          style: TextStyle(color: Colors.white),
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Container(
+        height: 50,
+        width: double.infinity,
+        child: RaisedButton(
+          color: AppColors.mainColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          onPressed: () {
+            Navigator.pushNamed(context, AppConst.routeCreateAddress);
+          },
+          child: Text(
+            'TIẾP TỤC',
+            style: TextStyle(color: Colors.white),
+          ),
         ),
       ),
     );

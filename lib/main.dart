@@ -4,6 +4,7 @@ import 'package:manage_delivery/features/manager_employee/detail_employee/detail
 import 'package:manage_delivery/features/manager_product/address/address_page.dart';
 import 'package:manage_delivery/features/manager_product/create_product/create_product_page.dart';
 import 'package:manage_delivery/features/manager_product/detail_product/detail_product_page.dart';
+import 'package:manage_delivery/features/manager_product/enter_product/enter_product_page.dart';
 import 'package:manage_delivery/utils/key_board.dart';
 
 import 'base/consts/const.dart';
@@ -67,6 +68,8 @@ class _MyAppState extends State<MyApp> {
         return DetailCustomerPage();
       case AppConst.routeDetailShipper:
         return DetailEmployeePage();
+      case AppConst.routeEnterProduct:
+        return EnterProductPage();
     }
     return null;
   }

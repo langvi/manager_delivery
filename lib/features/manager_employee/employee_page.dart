@@ -75,9 +75,9 @@ class _EmployeePageState
               height: 80,
               width: 80,
               decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: AppColors.gradientShipped),
+                  gradient: LinearGradient(colors: [Colors.grey[400], Colors.white]),
                   shape: BoxShape.circle),
-              child: SvgPicture.asset('assets/images/ship.svg')),
+              child: Image.asset('assets/images/icon_ship.png')),
           SizedBox(
             width: 10,
           ),
@@ -194,4 +194,5 @@ class _EmployeePageState
       ),
     );
   }
+  
 }

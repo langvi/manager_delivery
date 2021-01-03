@@ -3,6 +3,7 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/consts/const.dart';
 import 'package:manage_delivery/base/view/base_widget.dart';
+import 'package:manage_delivery/utils/dropdown_widget.dart';
 import 'package:manage_delivery/utils/input_text.dart';
 
 class CustomerPage extends StatefulWidget {
@@ -14,11 +15,32 @@ class CustomerPage extends StatefulWidget {
 
 class _CustomerPageState extends State<CustomerPage> {
   TextEditingController searchController = TextEditingController();
+  ScrollController controller = ScrollController();
+  bool isShowInfor = true;
+  String currentValue = '';
+  List<String> values = ['Tất cả', 'Đống Đa'];
+  @override
+  void initState() {
+    controller.addListener(() {
+      if (controller.position.pixels > 30) {
+        setState(() {
+          isShowInfor = false;
+        });
+      } else {
+        setState(() {
+          isShowInfor = true;
+        });
+      }
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backGround,
       body: NestedScrollView(
+          controller: controller,
           headerSliverBuilder: (context, isScroll) {
             return [
               SliverAppBar(
@@ -37,7 +59,7 @@ class _CustomerPageState extends State<CustomerPage> {
                         children: [
                           Text(
                             'Quản lí khách hàng',
-                            style: TextStyle(fontSize: 14),
+                            style: TextStyle(fontSize: isShowInfor ? 14 : 18),
                           ),
                           Spacer(),
                           IconButton(
@@ -57,13 +79,13 @@ class _CustomerPageState extends State<CustomerPage> {
                         ],
                       ),
                       Visibility(
-                        visible: !isScroll,
+                        visible: isShowInfor,
                         child: SizedBox(
                           height: 10,
                         ),
                       ),
                       Visibility(
-                        visible: !isScroll,
+                        visible: isShowInfor,
                         child: Row(
                           children: [
                             Container(
@@ -95,11 +117,46 @@ class _CustomerPageState extends State<CustomerPage> {
                                     )
                                   ]),
                             ),
+                            Spacer(),
+                            Container(
+                                height: 30,
+                                width: 100,
+                                child: DropdownButton<String>(
+                                  isExpanded: true,
+                                  hint: Text(
+                                    'Chọn khu vực',
+                                    style: TextStyle(
+                                        color: Colors.grey, fontSize: 12),
+                                  ),
+                                  underline: Container(),
+                                  value: currentValue.isEmpty
+                                      ? null
+                                      : currentValue,
+                                  dropdownColor: AppColors.mainColor,
+                                  style: TextStyle(color: Colors.white),
+                                  iconEnabledColor: Colors.white,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      currentValue = value;
+                                    });
+                                  },
+                                  items: values.map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(
+                                        value,
+                                        style: TextStyle(
+                                            fontSize: 14, color: Colors.white),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ))
                           ],
                         ),
                       ),
                       Visibility(
-                        visible: !isScroll,
+                        visible: isShowInfor,
                         child: SizedBox(
                           height: 10,
                         ),
