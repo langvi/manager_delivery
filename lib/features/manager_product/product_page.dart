@@ -5,9 +5,13 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/view/base_staful_widget.dart';
 import 'package:manage_delivery/features/manager_product/bloc/product_bloc.dart';
+import 'package:manage_delivery/features/manager_product/model/infor_response.dart';
 import 'package:manage_delivery/features/manager_product/model/product_response.dart';
+import 'package:manage_delivery/utils/convert_value.dart';
 import 'package:manage_delivery/utils/dropdown_widget.dart';
 import 'package:manage_delivery/utils/input_text.dart';
+import 'package:manage_delivery/utils/status_product.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../base/consts/const.dart';
 
@@ -21,18 +25,21 @@ class ProductPage extends StatefulWidget {
 class _ProductPageState
     extends BaseStatefulWidgetState<ProductPage, ProductBloc>
     with SingleTickerProviderStateMixin {
-  List<Product> products;
+  List<Product> products = [];
   TextEditingController searchController = TextEditingController();
+  final _refreshController = RefreshController();
+  final _scrollController = ScrollController();
   // TabController _tabController;
   // int currentPage = 0;
   String currentValue = 'Tất cả';
   List<String> values = ['Tất cả', 'Đống Đa'];
+  InforProduct inforProduct;
   @override
   void initBloc() {
+    inforProduct = InforProduct();
     bloc = ProductBloc();
-    products = List<Product>.generate(6, (index) {
-      return createProduct(index);
-    });
+    bloc.add(GetAllProduct());
+    bloc.add(GetInforProduct());
     // _tabController = TabController(length: 4, vsync: this);
     // bloc.add(GetAllProduct());
   }
@@ -48,6 +55,13 @@ class _ProductPageState
           } else if (state is GetAllProductSuccess) {
             isShowLoading = false;
             products = state.products;
+            _refreshController.refreshCompleted();
+          } else if (state is GetMoreProductSuccess) {
+            products.addAll(state.products);
+            _refreshController.loadComplete();
+          } else if (state is GetInforSuccess) {
+            isShowLoading = false;
+            inforProduct = state.inforProduct;
           } else if (state is Error) {}
         },
         builder: (context, state) {
@@ -81,33 +95,30 @@ class _ProductPageState
   }
 
   Widget _buildBody() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          SizedBox(
-            height: 5,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildHeader(),
+        SizedBox(
+          height: 5,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Danh sách đơn hàng',
+                style: TextStyle(
+                    color: AppColors.mainColor,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold),
+              ),
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Danh sách đơn hàng',
-                  style: TextStyle(
-                      color: AppColors.mainColor,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
-          // _buildGeneral(),
-          _buildListProduct()
-        ],
-      ),
+        ),
+        Expanded(child: _buildListProduct())
+      ],
     );
   }
 
@@ -125,24 +136,27 @@ class _ProductPageState
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Expanded(child: _buildItem('Tất cả ', 120, AppColors.gradientAll)),
+            Expanded(
+                child: _buildItem('Tất cả ', inforProduct.totalProduct,
+                    AppColors.gradientAll)),
             SizedBox(
               width: 5,
             ),
             Expanded(
-                child:
-                    _buildItem('Đang lấy', 11, AppColors.gradientGetProduct)),
+                child: _buildItem('Đang lấy', inforProduct.totalGetting,
+                    AppColors.gradientGetProduct)),
             SizedBox(
               width: 5,
             ),
             Expanded(
-                child:
-                    _buildItem('Đang giao', 100, AppColors.gradientShipping)),
+                child: _buildItem('Đang giao', inforProduct.totalShipping,
+                    AppColors.gradientShipping)),
             SizedBox(
               width: 5,
             ),
             Expanded(
-                child: _buildItem('Đã giao', 9, AppColors.gradientShipped)),
+                child: _buildItem('Đã giao', inforProduct.totalShiped,
+                    AppColors.gradientShipped)),
           ],
         ),
       ),
@@ -238,26 +252,28 @@ class _ProductPageState
     );
   }
 
-  Product createProduct(int status) {
-    return Product(
-      address: '58 Le Ha Nang - Dong Da - Ha Noi',
-      sendFrom: 'Alibaba',
-      id: 'u3j3juwms',
-      createdAt: '20/11/1111',
-      status: status,
-    );
-  }
-
   Widget _buildListProduct() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: ListView.builder(
-        physics: NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: 10,
-        itemBuilder: (context, index) {
-          return _buildItemProduct(index);
-        },
+    return SmartRefresher(
+      scrollController: _scrollController,
+      controller: _refreshController,
+      enablePullDown: true,
+      enablePullUp: true,
+      onLoading: () {
+        bloc.add(GetAllProduct(isLoadMore: true));
+      },
+      onRefresh: () {
+        bloc.add(GetAllProduct(isRefresh: true));
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: ListView.builder(
+          shrinkWrap: true,
+          controller: _scrollController,
+          itemCount: products.length,
+          itemBuilder: (context, index) {
+            return _buildItemProduct(index);
+          },
+        ),
       ),
     );
   }
@@ -278,7 +294,8 @@ class _ProductPageState
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
                       gradient: LinearGradient(
-                          colors: [Colors.blue[700], Colors.blue[300]]),
+                          colors: getGradient(products[index].statusShip,
+                              products[index].isSuccess)),
                       shape: BoxShape.circle),
                   child: SvgPicture.asset(
                     'assets/images/product.svg',
@@ -294,18 +311,23 @@ class _ProductPageState
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        RichText(
-                          text: TextSpan(
-                              text: 'Mã đơn hàng: ',
-                              style: TextStyle(color: Colors.black),
-                              children: [
-                                TextSpan(
-                                  text: '5efefe5',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                )
-                              ]),
+                        Expanded(
+                          child: RichText(
+                            // overflow: TextOverflow.ellipsis,
+                            text: TextSpan(
+                                text: 'Mã đơn hàng: ',
+                                style: TextStyle(color: Colors.black),
+                                children: [
+                                  TextSpan(
+                                    text: products[index].id,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  )
+                                ]),
+                          ),
                         ),
-                        Text('20/12/2021'),
+                        SizedBox(width: 5),
+                        Text(convertDateTimeToDay(products[index].createdAt)),
                       ],
                     ),
                     Padding(
@@ -319,13 +341,13 @@ class _ProductPageState
                                 style: TextStyle(color: Colors.black),
                                 children: [
                                   TextSpan(
-                                    text: 'Hoa',
+                                    text: products[index].sendFrom,
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   )
                                 ]),
                           ),
-                          Text('12:02')
+                          Text(convertDateTimeToHour(products[index].createdAt))
                         ],
                       ),
                     ),
@@ -338,7 +360,7 @@ class _ProductPageState
                                 style: TextStyle(color: Colors.black),
                                 children: [
                                   TextSpan(
-                                    text: 'Hoa Bằng, Cầu Giấy, Hà Nội',
+                                    text: products[index].addressReceive,
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   )
@@ -349,9 +371,15 @@ class _ProductPageState
                             padding: EdgeInsets.all(3),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                color: Colors.blue),
+                                color: getColor(
+                                    products[index].statusShip,
+                                    products[index].isSuccess,
+                                    products[index].isEnter)),
                             child: Text(
-                              'fefe',
+                              getStatusOfProduct(
+                                  products[index].statusShip,
+                                  products[index].isSuccess,
+                                  products[index].isEnter),
                               style: TextStyle(color: Colors.white),
                             )),
                       ],
@@ -419,29 +447,5 @@ class _ProductPageState
       );
       return list;
     });
-  }
-
-  String getStatus(int status) {
-    String strStatus = '';
-    switch (status) {
-      case 0:
-        strStatus = 'Đang lấy';
-        break;
-      case 1:
-        strStatus = 'Đã lấy';
-        break;
-      case 2:
-        strStatus = 'Đã nhập kho';
-        break;
-      case 3:
-        strStatus = 'Đang giao';
-        break;
-      case 4:
-        strStatus = 'Đã giao';
-        break;
-      default:
-        strStatus = 'Chua co';
-    }
-    return strStatus;
   }
 }

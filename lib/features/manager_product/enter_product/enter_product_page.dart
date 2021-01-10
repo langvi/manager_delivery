@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/consts/const.dart';
+import 'package:manage_delivery/base/view/base_staful_widget.dart';
+import 'package:manage_delivery/features/manager_product/enter_product/bloc/enter_bloc.dart';
+import 'package:manage_delivery/features/manager_product/model/product_response.dart';
+import 'package:manage_delivery/utils/convert_value.dart';
 import 'package:manage_delivery/utils/input_text.dart';
 import 'package:manage_delivery/utils/scan_qr.dart';
+import 'package:manage_delivery/utils/status_product.dart';
 
 class EnterProductPage extends StatefulWidget {
   EnterProductPage({Key key}) : super(key: key);
@@ -13,20 +19,41 @@ class EnterProductPage extends StatefulWidget {
   _EnterProductPageState createState() => _EnterProductPageState();
 }
 
-class _EnterProductPageState extends State<EnterProductPage> {
+class _EnterProductPageState
+    extends BaseStatefulWidgetState<EnterProductPage, EnterBloc> {
   TextEditingController _controller = TextEditingController();
   String productId;
+  List<Product> products = [];
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.mainColor,
-        leading: BackButton(
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text('Nhập đơn hàng'),
+  void initBloc() {
+    bloc = EnterBloc();
+  }
+
+  @override
+  Widget buildWidgets(BuildContext context) {
+    return BlocProvider<EnterBloc>(
+      create: (context) => bloc,
+      child: BlocConsumer<EnterBloc, EnterState>(
+        listener: (context, state) {
+          if (state is EnterSuccess) {
+            products.add(state.product);
+          } else if (state is Error) {
+            showErrorPopup(state.message, StackTrace.current);
+          }
+        },
+        builder: (context, state) {
+          return Scaffold(
+            appBar: AppBar(
+              backgroundColor: AppColors.mainColor,
+              leading: BackButton(
+                onPressed: () => Navigator.pop(context),
+              ),
+              title: Text('Nhập đơn hàng'),
+            ),
+            body: _buildBody(),
+          );
+        },
       ),
-      body: _buildBody(),
     );
   }
 
@@ -51,9 +78,7 @@ class _EnterProductPageState extends State<EnterProductPage> {
               onPressed: () async {
                 productId = await scanQRcode();
                 if (productId != null) {
-                  setState(() {
-                    _controller.text = productId;
-                  });
+                  bloc.add(EnterProduct(productId));
                 }
               })
         ],
@@ -67,7 +92,7 @@ class _EnterProductPageState extends State<EnterProductPage> {
       child: ListView.builder(
         physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
-        itemCount: 3,
+        itemCount: products.length,
         itemBuilder: (context, index) {
           return _buildItemProduct(index);
         },
@@ -91,7 +116,8 @@ class _EnterProductPageState extends State<EnterProductPage> {
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
                       gradient: LinearGradient(
-                          colors: [Colors.blue[700], Colors.blue[300]]),
+                          colors: getGradient(products[index].statusShip,
+                              products[index].isSuccess)),
                       shape: BoxShape.circle),
                   child: SvgPicture.asset(
                     'assets/images/product.svg',
@@ -107,18 +133,23 @@ class _EnterProductPageState extends State<EnterProductPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        RichText(
-                          text: TextSpan(
-                              text: 'Mã đơn hàng: ',
-                              style: TextStyle(color: Colors.black),
-                              children: [
-                                TextSpan(
-                                  text: '5efefe5',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                )
-                              ]),
+                        Expanded(
+                          child: RichText(
+                            // overflow: TextOverflow.ellipsis,
+                            text: TextSpan(
+                                text: 'Mã đơn hàng: ',
+                                style: TextStyle(color: Colors.black),
+                                children: [
+                                  TextSpan(
+                                    text: products[index].id,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  )
+                                ]),
+                          ),
                         ),
-                        Text('20/12/2021'),
+                        SizedBox(width: 5),
+                        Text(convertDateTimeToDay(products[index].enterAt)),
                       ],
                     ),
                     Padding(
@@ -132,13 +163,13 @@ class _EnterProductPageState extends State<EnterProductPage> {
                                 style: TextStyle(color: Colors.black),
                                 children: [
                                   TextSpan(
-                                    text: 'Hoa',
+                                    text: products[index].sendFrom,
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   )
                                 ]),
                           ),
-                          Text('12:02')
+                          Text(convertDateTimeToHour(products[index].enterAt))
                         ],
                       ),
                     ),
@@ -151,7 +182,7 @@ class _EnterProductPageState extends State<EnterProductPage> {
                                 style: TextStyle(color: Colors.black),
                                 children: [
                                   TextSpan(
-                                    text: 'Hoa Bằng, Cầu Giấy, Hà Nội',
+                                    text: products[index].addressReceive,
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   )
@@ -162,9 +193,15 @@ class _EnterProductPageState extends State<EnterProductPage> {
                             padding: EdgeInsets.all(3),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                color: Colors.blue),
+                                color: getColor(
+                                    products[index].statusShip,
+                                    products[index].isSuccess,
+                                    products[index].isEnter)),
                             child: Text(
-                              'fefe',
+                              getStatusOfProduct(
+                                  products[index].statusShip,
+                                  products[index].isSuccess,
+                                  products[index].isEnter),
                               style: TextStyle(color: Colors.white),
                             )),
                       ],

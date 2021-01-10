@@ -14,3 +14,15 @@ class GetAllProductSuccess extends ProductState {
 }
 
 class Error extends ProductState {}
+
+class GetMoreProductSuccess extends ProductState {
+  final List<Product> products;
+
+  GetMoreProductSuccess(this.products);
+}
+
+class GetInforSuccess extends ProductState {
+  final InforProduct inforProduct;
+
+  GetInforSuccess(this.inforProduct);
+}
