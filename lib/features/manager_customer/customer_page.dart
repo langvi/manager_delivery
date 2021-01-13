@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/consts/const.dart';
-import 'package:manage_delivery/base/view/base_widget.dart';
-import 'package:manage_delivery/utils/dropdown_widget.dart';
-import 'package:manage_delivery/utils/input_text.dart';
+import 'package:manage_delivery/base/view/base_staful_widget.dart';
+import 'package:manage_delivery/features/manager_customer/bloc/customer_bloc.dart';
+import 'package:manage_delivery/features/manager_customer/model/customer_response.dart';
+import 'package:manage_delivery/utils/dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CustomerPage extends StatefulWidget {
   CustomerPage({Key key}) : super(key: key);
@@ -13,14 +16,19 @@ class CustomerPage extends StatefulWidget {
   _CustomerPageState createState() => _CustomerPageState();
 }
 
-class _CustomerPageState extends State<CustomerPage> {
+class _CustomerPageState
+    extends BaseStatefulWidgetState<CustomerPage, CustomerBloc> {
   TextEditingController searchController = TextEditingController();
   ScrollController controller = ScrollController();
   bool isShowInfor = true;
   String currentValue = '';
+  int totalCustomer = 0;
+  List<Customer> customers = [];
   List<String> values = ['Tất cả', 'Đống Đa'];
   @override
-  void initState() {
+  void initBloc() {
+    bloc = CustomerBloc();
+    bloc.add(GetAllCustomer());
     controller.addListener(() {
       if (controller.position.pixels > 30) {
         setState(() {
@@ -32,143 +40,170 @@ class _CustomerPageState extends State<CustomerPage> {
         });
       }
     });
-    super.initState();
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backGround,
-      body: NestedScrollView(
-          controller: controller,
-          headerSliverBuilder: (context, isScroll) {
-            return [
-              SliverAppBar(
-                expandedHeight: 150,
-                floating: false,
-                pinned: true,
-                automaticallyImplyLeading: false,
-                flexibleSpace: FlexibleSpaceBar(
-                  titlePadding: EdgeInsets.only(left: 20),
-                  centerTitle: true,
-                  title: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'Quản lí khách hàng',
-                            style: TextStyle(fontSize: isShowInfor ? 14 : 18),
-                          ),
-                          Spacer(),
-                          IconButton(
-                              icon: Icon(
-                                Icons.search,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              onPressed: () {}),
-                          // IconButton(
-                          //     icon: Icon(
-                          //       MaterialCommunityIcons.filter_variant,
-                          //       color: Colors.white,
-                          //       size: 20,
-                          //     ),
-                          //     onPressed: () {}),
-                        ],
-                      ),
-                      Visibility(
-                        visible: isShowInfor,
-                        child: SizedBox(
-                          height: 10,
-                        ),
-                      ),
-                      Visibility(
-                        visible: isShowInfor,
-                        child: Row(
-                          children: [
-                            Container(
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                        colors: [Colors.red, Colors.orange]),
-                                    shape: BoxShape.circle),
-                                child: Icon(
-                                  Icons.people,
-                                  color: Colors.white,
-                                )),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            RichText(
-                              text: TextSpan(
-                                  text: '100',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                  children: [
-                                    TextSpan(
-                                      text: '\nKhách hàng',
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.normal),
-                                    )
-                                  ]),
-                            ),
-                            Spacer(),
-                            Container(
-                                height: 30,
-                                width: 100,
-                                child: DropdownButton<String>(
-                                  isExpanded: true,
-                                  hint: Text(
-                                    'Chọn khu vực',
+  Widget buildWidgets(BuildContext context) {
+    return BlocProvider<CustomerBloc>(
+      create: (context) => bloc,
+      child: BlocConsumer<CustomerBloc, CustomerState>(
+        listener: (context, state) {
+          if (state is Loading) {
+            isShowLoading = true;
+          } else if (state is GetCustomerSuccess) {
+            isShowLoading = false;
+            customers = state.customers;
+            totalCustomer = state.totalCustomer;
+          } else if (state is Error) {
+            isShowLoading = false;
+            ShowDialog(context).showNotification(state.message);
+          }
+        },
+        builder: (context, state) {
+          return baseShowLoading(
+            child: Scaffold(
+              backgroundColor: AppColors.backGround,
+              body: NestedScrollView(
+                  controller: controller,
+                  headerSliverBuilder: (context, isScroll) {
+                    return [
+                      SliverAppBar(
+                        expandedHeight: 150,
+                        floating: false,
+                        pinned: true,
+                        automaticallyImplyLeading: false,
+                        flexibleSpace: FlexibleSpaceBar(
+                          titlePadding: EdgeInsets.only(left: 20),
+                          centerTitle: true,
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    'Quản lí khách hàng',
                                     style: TextStyle(
-                                        color: Colors.grey, fontSize: 12),
+                                        fontSize: isShowInfor ? 14 : 18),
                                   ),
-                                  underline: Container(),
-                                  value: currentValue.isEmpty
-                                      ? null
-                                      : currentValue,
-                                  dropdownColor: AppColors.mainColor,
-                                  style: TextStyle(color: Colors.white),
-                                  iconEnabledColor: Colors.white,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      currentValue = value;
-                                    });
-                                  },
-                                  items: values.map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(
-                                        value,
-                                        style: TextStyle(
-                                            fontSize: 14, color: Colors.white),
+                                  Spacer(),
+                                  IconButton(
+                                      icon: Icon(
+                                        Icons.search,
+                                        color: Colors.white,
+                                        size: 20,
                                       ),
-                                    );
-                                  }).toList(),
-                                ))
-                          ],
+                                      onPressed: () {}),
+                                  // IconButton(
+                                  //     icon: Icon(
+                                  //       MaterialCommunityIcons.filter_variant,
+                                  //       color: Colors.white,
+                                  //       size: 20,
+                                  //     ),
+                                  //     onPressed: () {}),
+                                ],
+                              ),
+                              Visibility(
+                                visible: isShowInfor,
+                                child: SizedBox(
+                                  height: 10,
+                                ),
+                              ),
+                              Visibility(
+                                visible: isShowInfor,
+                                child: Row(
+                                  children: [
+                                    Container(
+                                        padding: EdgeInsets.all(5),
+                                        decoration: BoxDecoration(
+                                            gradient: LinearGradient(colors: [
+                                              Colors.red,
+                                              Colors.orange
+                                            ]),
+                                            shape: BoxShape.circle),
+                                        child: Icon(
+                                          Icons.people,
+                                          color: Colors.white,
+                                        )),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    RichText(
+                                      text: TextSpan(
+                                          text: totalCustomer.toString(),
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                          children: [
+                                            TextSpan(
+                                              text: '\nKhách hàng',
+                                              style: TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                            )
+                                          ]),
+                                    ),
+                                    Spacer(),
+                                    Container(
+                                        height: 30,
+                                        width: 100,
+                                        child: DropdownButton<String>(
+                                          isExpanded: true,
+                                          hint: Text(
+                                            'Chọn khu vực',
+                                            style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 12),
+                                          ),
+                                          underline: Container(),
+                                          value: currentValue.isEmpty
+                                              ? null
+                                              : currentValue,
+                                          dropdownColor: AppColors.mainColor,
+                                          style: TextStyle(color: Colors.white),
+                                          iconEnabledColor: Colors.white,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              currentValue = value;
+                                            });
+                                          },
+                                          items: values
+                                              .map<DropdownMenuItem<String>>(
+                                                  (String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Text(
+                                                value,
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.white),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ))
+                                  ],
+                                ),
+                              ),
+                              Visibility(
+                                visible: isShowInfor,
+                                child: SizedBox(
+                                  height: 10,
+                                ),
+                              )
+                            ],
+                          ),
                         ),
+                        backgroundColor: AppColors.mainColor,
                       ),
-                      Visibility(
-                        visible: isShowInfor,
-                        child: SizedBox(
-                          height: 10,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                backgroundColor: AppColors.mainColor,
-              ),
-            ];
-          },
-          body: _buildBody()),
+                    ];
+                  },
+                  body: _buildBody()),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -182,9 +217,9 @@ class _CustomerPageState extends State<CustomerPage> {
           ),
           Expanded(
             child: ListView.builder(
-                itemCount: 10,
+                itemCount: customers.length,
                 itemBuilder: (context, index) {
-                  return _buildItemCustomer();
+                  return _buildItemCustomer(index);
                 }),
           ),
         ],
@@ -207,7 +242,7 @@ class _CustomerPageState extends State<CustomerPage> {
     );
   }
 
-  Widget _buildItemCustomer() {
+  Widget _buildItemCustomer(int index) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 5,
@@ -224,14 +259,19 @@ class _CustomerPageState extends State<CustomerPage> {
               ),
               Container(
                 padding: EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    gradient:
-                        LinearGradient(colors: [Colors.red, Colors.orange]),
-                    shape: BoxShape.circle),
-                child: Icon(
-                  MaterialIcons.person,
-                  color: Colors.white,
-                  size: 34,
+                // decoration: BoxDecoration(
+                //     gradient:
+                //         LinearGradient(colors: [Colors.red, Colors.orange]),
+                //     shape: BoxShape.circle),
+                child: CircleAvatar(
+                  child: customers[index].avatarUrl.isNotEmpty
+                      ? Image.network(
+                          customers[index].avatarUrl,
+                          fit: BoxFit.cover,
+                        )
+                      : Icon(
+                          Icons.person,
+                        ),
                 ),
               ),
               SizedBox(
@@ -249,7 +289,7 @@ class _CustomerPageState extends State<CustomerPage> {
                             style: TextStyle(color: Colors.black),
                             children: [
                               TextSpan(
-                                text: 'SDSS',
+                                text: customers[index].name,
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               )
                             ]),
@@ -263,7 +303,7 @@ class _CustomerPageState extends State<CustomerPage> {
                             style: TextStyle(color: Colors.black),
                             children: [
                               TextSpan(
-                                text: '0123546987',
+                                text: customers[index].phoneNumber,
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               )
                             ]),
@@ -277,7 +317,7 @@ class _CustomerPageState extends State<CustomerPage> {
                             style: TextStyle(color: Colors.black),
                             children: [
                               TextSpan(
-                                text: '23 Mạc Thái Tông, Cầu Giấy, Hà Nội',
+                                text: customers[index].address,
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               )
                             ]),
@@ -290,7 +330,9 @@ class _CustomerPageState extends State<CustomerPage> {
                 width: 10,
               ),
               InkWell(
-                  onTap: () {},
+                  onTap: () async {
+                    await launch("tel://${customers[index].phoneNumber}");
+                  },
                   child: Icon(
                     Icons.phone,
                     color: Colors.blue,

@@ -7,7 +7,7 @@ class EnterRepository {
   Future<EnterResponse> enterProduct(String id) async {
     var response = await _baseRequest.sendRequest(
         AppConst.enterProductUrl, RequestMethod.POST,
-        jsonMap: {'productId': id}, sendHeader: false);
+        jsonMap: {'productId': id});
     return EnterResponse.fromJson(response);
   }
 }

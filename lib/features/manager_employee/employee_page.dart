@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/consts/const.dart';
 import 'package:manage_delivery/base/view/base_staful_widget.dart';
-import 'package:manage_delivery/base/view/base_widget.dart';
 import 'package:manage_delivery/features/manager_employee/bloc/employee_bloc.dart';
+import 'package:manage_delivery/features/manager_employee/model/employee_response.dart';
+import 'package:manage_delivery/utils/dialog.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EmployeePage extends StatefulWidget {
   EmployeePage({Key key}) : super(key: key);
@@ -16,9 +18,13 @@ class EmployeePage extends StatefulWidget {
 
 class _EmployeePageState
     extends BaseStatefulWidgetState<EmployeePage, EmployeeBloc> {
+  List<Employee> employees = [];
+  int totalShipper = 0;
+  final _refreshController = RefreshController();
   @override
   void initBloc() {
     bloc = EmployeeBloc();
+    bloc.add(GetEmployees());
   }
 
   @override
@@ -26,7 +32,18 @@ class _EmployeePageState
     return BlocProvider<EmployeeBloc>(
       create: (context) => bloc,
       child: BlocConsumer<EmployeeBloc, EmployeeState>(
-        listener: (context, state) {},
+        listener: (context, state) {
+          if (state is Loading) {
+            isShowLoading = true;
+          } else if (state is GetEmployeeSuccess) {
+            isShowLoading = false;
+            employees.addAll(state.employees);
+            totalShipper = state.totalShipper;
+          } else if (state is Error) {
+            isShowLoading = false;
+            ShowDialog(context).showNotification(state.message);
+          }
+        },
         builder: (context, state) {
           return baseShowLoading(
               child: Scaffold(
@@ -50,7 +67,17 @@ class _EmployeePageState
   }
 
   Widget _buildBody() {
-    return SingleChildScrollView(
+    return SmartRefresher(
+      controller: _refreshController,
+      enablePullDown: true,
+      enablePullUp: true,
+      onLoading: () {
+        bloc.add(GetEmployees(isLoadMore: true));
+      },
+      onRefresh: () {
+        employees.clear();
+        bloc.add(GetEmployees(isRefresh: true));
+      },
       child: Column(
         children: [
           _buildTitle(),
@@ -75,7 +102,8 @@ class _EmployeePageState
               height: 80,
               width: 80,
               decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [Colors.grey[400], Colors.white]),
+                  gradient:
+                      LinearGradient(colors: [Colors.grey[400], Colors.white]),
                   shape: BoxShape.circle),
               child: Image.asset('assets/images/icon_ship.png')),
           SizedBox(
@@ -83,7 +111,7 @@ class _EmployeePageState
           ),
           RichText(
             text: TextSpan(
-                text: '50',
+                text: totalShipper.toString(),
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -105,7 +133,7 @@ class _EmployeePageState
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: ListView.builder(
-          itemCount: 10,
+          itemCount: employees.length,
           physics: NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           itemBuilder: (context, index) {
@@ -127,16 +155,46 @@ class _EmployeePageState
           padding: const EdgeInsets.all(10.0),
           child: Row(
             children: [
-              SizedBox(
-                height: 60,
-                width: 60,
-                child: CircleAvatar(
-                  backgroundImage: Image.asset(
-                    'assets/images/no_avatar.png',
-                    fit: BoxFit.fill,
-                  ).image,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(40),
+                child: Container(
+                  height: 60,
+                  width: 60,
+                  child: employees[index].avatarUrl.isNotEmpty
+                      ? Image.network(
+                          AppConst.baseImageUrl + employees[index].avatarUrl,
+                          // height: double.infinity,
+                          // width: double.infinity,
+                          fit: BoxFit.cover,
+                        )
+                      : Container(
+                          color: Colors.grey[400],
+                          child: Image.asset(
+                            'assets/images/no_avatar.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                 ),
               ),
+              // Container(
+              //   height: 60,
+              //   width: 60,
+              //   decoration: BoxDecoration(
+              //       shape: BoxShape.circle,
+              //       image: DecorationImage(
+              //           image: employees[index].avatarUrl.isNotEmpty
+              //               ? Image.network(
+              //                   AppConst.baseImageUrl +
+              //                       employees[index].avatarUrl,
+              //                   height: double.infinity,
+              //                   width: double.infinity,
+              //                   fit: BoxFit.cover,
+              //                 ).image
+              //               : Image.asset(
+              //                   'assets/images/no_avatar.png',
+              //                   fit: BoxFit.cover,
+              //                 ).image)),
+              // ),
               SizedBox(
                 width: 10,
               ),
@@ -147,7 +205,7 @@ class _EmployeePageState
                     Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: Text(
-                        'Ha Van SH',
+                        employees[index].name,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -159,7 +217,7 @@ class _EmployeePageState
                             style: TextStyle(color: Colors.black),
                             children: [
                               TextSpan(
-                                text: '0123546987',
+                                text: employees[index].phoneNumber,
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               )
                             ]),
@@ -173,7 +231,7 @@ class _EmployeePageState
                             style: TextStyle(color: Colors.black),
                             children: [
                               TextSpan(
-                                text: 'Đống Đa - Hà Nội',
+                                text: employees[index].shipArea,
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               )
                             ]),
@@ -187,12 +245,13 @@ class _EmployeePageState
                     Icons.phone,
                     color: Colors.blue,
                   ),
-                  onPressed: () {})
+                  onPressed: () async {
+                    await launch("tel://${employees[index].phoneNumber}");
+                  })
             ],
           ),
         ),
       ),
     );
   }
-  
 }

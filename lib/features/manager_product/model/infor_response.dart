@@ -36,3 +36,35 @@ class InforProduct {
         totalShiped: json["TotalShiped"],
       );
 }
+
+class CustomerProductResponse {
+  CustomerProductResponse({
+    this.message,
+    this.isSuccess,
+    this.infor,
+  });
+
+  String message;
+  bool isSuccess;
+  CustomerProduct infor;
+
+  factory CustomerProductResponse.fromJson(Map<String, dynamic> json) =>
+      CustomerProductResponse(
+        message: json["message"],
+        isSuccess: json["isSuccess"],
+        infor: CustomerProduct.fromJson(json["data"]),
+      );
+}
+
+class CustomerProduct {
+  String name;
+  String phone;
+  String address;
+  CustomerProduct({this.address, this.name, this.phone});
+  factory CustomerProduct.fromJson(Map<String, dynamic> json) =>
+      CustomerProduct(
+        name: json["name"],
+        phone: json["phoneNumber"],
+        address: json['address'],
+      );
+}

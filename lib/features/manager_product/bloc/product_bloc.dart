@@ -29,6 +29,8 @@ class ProductBloc extends BaseBloc<ProductEvent, ProductState> {
       yield* _getAllProduct(event);
     } else if (event is GetInforProduct) {
       yield* _getInforProduct();
+    } else if (event is GetInforCustomer) {
+      yield* _getInforCusOfProduct(event);
     }
   }
 
@@ -55,6 +57,17 @@ class ProductBloc extends BaseBloc<ProductEvent, ProductState> {
     var response = await _productRepository.getInforProduct();
     if (response.isSuccess) {
       yield GetInforSuccess(response.infor);
+    } else {
+      yield Error();
+    }
+  }
+
+  Stream<ProductState> _getInforCusOfProduct(GetInforCustomer event) async* {
+    yield Loading();
+    var response =
+        await _productRepository.getInforCustomerOfProduct(event.idProduct);
+    if (response.isSuccess) {
+      yield GetInforCustomerSuccess(response.infor);
     } else {
       yield Error();
     }

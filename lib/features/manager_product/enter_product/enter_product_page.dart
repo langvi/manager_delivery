@@ -8,6 +8,7 @@ import 'package:manage_delivery/base/view/base_staful_widget.dart';
 import 'package:manage_delivery/features/manager_product/enter_product/bloc/enter_bloc.dart';
 import 'package:manage_delivery/features/manager_product/model/product_response.dart';
 import 'package:manage_delivery/utils/convert_value.dart';
+import 'package:manage_delivery/utils/dialog.dart';
 import 'package:manage_delivery/utils/input_text.dart';
 import 'package:manage_delivery/utils/scan_qr.dart';
 import 'package:manage_delivery/utils/status_product.dart';
@@ -38,7 +39,7 @@ class _EnterProductPageState
           if (state is EnterSuccess) {
             products.add(state.product);
           } else if (state is Error) {
-            showErrorPopup(state.message, StackTrace.current);
+            ShowDialog(context).showNotification(state.message);
           }
         },
         builder: (context, state) {

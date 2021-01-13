@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:manage_delivery/base/consts/const.dart';
+import 'package:manage_delivery/main.dart';
+
 enum RequestMethod { POST, GET, PUT }
 
 class BaseRequest {
@@ -42,12 +44,8 @@ class BaseRequest {
   }
 
   Map<String, dynamic> _getHearder(bool isTokenPre) {
-    String token = '';
+    String token = prefs.getString(AppConst.keyToken) ?? '';
 
-    // token = isTokenPre
-    //     ? prefs.getString(AppConst.keyTokenPre)
-    //     : prefs.getString(AppConst.keyTokenAfter);
-
-    return {"Authorization": "Bearer $token"};
+    return {"x-access-token": "$token"};
   }
 }

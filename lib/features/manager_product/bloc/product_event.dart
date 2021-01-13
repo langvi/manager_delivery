@@ -11,3 +11,9 @@ class GetAllProduct extends ProductEvent {
 }
 
 class GetInforProduct extends ProductEvent {}
+
+class GetInforCustomer extends ProductEvent {
+  final String idProduct;
+
+  GetInforCustomer(this.idProduct);
+}

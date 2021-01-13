@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:manage_delivery/features/manager_customer/detail_customer/detail_customer_page.dart';
 import 'package:manage_delivery/features/manager_employee/detail_employee/detail_employee_page.dart';
 import 'package:manage_delivery/features/manager_product/address/address_page.dart';
@@ -6,19 +7,26 @@ import 'package:manage_delivery/features/manager_product/create_product/create_p
 import 'package:manage_delivery/features/manager_product/detail_product/detail_product_page.dart';
 import 'package:manage_delivery/features/manager_product/enter_product/enter_product_page.dart';
 import 'package:manage_delivery/utils/key_board.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'base/consts/const.dart';
 import 'features/home/home_page.dart';
 import 'features/login/login_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  prefs = await prefsInstance;
   runApp(MyApp());
 }
+
+final prefsInstance = SharedPreferences.getInstance();
 
 class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
 }
+
+SharedPreferences prefs;
 
 class _MyAppState extends State<MyApp> {
   @override
@@ -28,6 +36,10 @@ class _MyAppState extends State<MyApp> {
         hideKeyboard(context);
       },
       child: MaterialApp(
+        localizationsDelegates: [GlobalMaterialLocalizations.delegate],
+        supportedLocales: [
+          const Locale('vi'),
+        ],
         title: 'Manager Delivery',
         debugShowCheckedModeBanner: false,
         initialRoute: '/',

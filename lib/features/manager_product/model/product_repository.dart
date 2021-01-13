@@ -8,7 +8,7 @@ class ProductRepository {
   Future<ProductResponse> getAllProduct({int pageIndex = 0}) async {
     var response = await _baseRequest.sendRequest(
         AppConst.getAllProductUrl, RequestMethod.GET,
-        sendHeader: false, queryParams: {'pageIndex': pageIndex});
+        queryParams: {'pageIndex': pageIndex});
     return ProductResponse.fromJson(response);
   }
 
@@ -16,8 +16,14 @@ class ProductRepository {
     var response = await _baseRequest.sendRequest(
       AppConst.getInforProductUrl,
       RequestMethod.GET,
-      sendHeader: false,
     );
     return InforResponse.fromJson(response);
+  }
+
+  Future<CustomerProductResponse> getInforCustomerOfProduct(String id) async {
+    var response = await _baseRequest.sendRequest(
+        AppConst.getProductCustomerUrl, RequestMethod.GET,
+        queryParams: {'id': id});
+    return CustomerProductResponse.fromJson(response);
   }
 }

@@ -29,8 +29,6 @@ class _ProductPageState
   TextEditingController searchController = TextEditingController();
   final _refreshController = RefreshController();
   final _scrollController = ScrollController();
-  // TabController _tabController;
-  // int currentPage = 0;
   String currentValue = 'Tất cả';
   List<String> values = ['Tất cả', 'Đống Đa'];
   InforProduct inforProduct;
@@ -40,8 +38,6 @@ class _ProductPageState
     bloc = ProductBloc();
     bloc.add(GetAllProduct());
     bloc.add(GetInforProduct());
-    // _tabController = TabController(length: 4, vsync: this);
-    // bloc.add(GetAllProduct());
   }
 
   @override
@@ -136,27 +132,23 @@ class _ProductPageState
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Expanded(
-                child: _buildItem('Tất cả ', inforProduct.totalProduct,
-                    AppColors.gradientAll)),
+            _buildItem('Tất cả ', inforProduct.totalProduct,
+                AppColors.gradientAll),
             SizedBox(
               width: 5,
             ),
-            Expanded(
-                child: _buildItem('Đang lấy', inforProduct.totalGetting,
-                    AppColors.gradientGetProduct)),
+            _buildItem('Đang lấy', inforProduct.totalGetting,
+                AppColors.gradientGetProduct),
             SizedBox(
               width: 5,
             ),
-            Expanded(
-                child: _buildItem('Đang giao', inforProduct.totalShipping,
-                    AppColors.gradientShipping)),
+            _buildItem('Đang giao', inforProduct.totalShipping,
+                AppColors.gradientShipping),
             SizedBox(
               width: 5,
             ),
-            Expanded(
-                child: _buildItem('Đã giao', inforProduct.totalShiped,
-                    AppColors.gradientShipped)),
+            _buildItem('Đã giao', inforProduct.totalShiped,
+                AppColors.gradientShipped),
           ],
         ),
       ),
@@ -284,7 +276,8 @@ class _ProductPageState
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, AppConst.routeDetailProduct);
+          Navigator.pushNamed(context, AppConst.routeDetailProduct,
+              arguments: products[index]);
         },
         child: Container(
           padding: EdgeInsets.all(10),

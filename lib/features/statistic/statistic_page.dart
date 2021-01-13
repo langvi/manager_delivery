@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/view/base_widget.dart';
+import 'package:manage_delivery/features/statistic/circle_chart.dart';
 
 class StatisticPage extends StatefulWidget {
   StatisticPage({Key key}) : super(key: key);
@@ -22,40 +23,42 @@ class _StatisticPageState extends State<StatisticPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: AppColors.mainColor,
-        title: Text('Thống kê'),
-        // bottom: TabBar(
-        //   unselectedLabelColor: Colors.grey,
-        //   labelColor: Colors.black,
-        //   onTap: (value) {
-        //     setState(() {
-        //       currentPage = value;
-        //     });
-        //   },
-        //   controller: _tabController,
-        //   indicatorColor: Colors.black,
-        //   indicatorPadding: EdgeInsets.symmetric(horizontal: 10),
-        //   indicatorSize: TabBarIndicatorSize.tab,
-        //   indicatorWeight: 1.5,
-        //   tabs: [
-        //     Tab(
-        //       child: Text(
-        //         '',
-        //         style: TextStyle(fontWeight: FontWeight.bold),
-        //       ),
-        //     ),
-        //     Tab(
-        //       child: Text(friendRequest.toUpperCase(),
-        //           style: TextStyle(fontWeight: FontWeight.bold)),
-        //     )
-        //   ],
-        // ),
-      ),
-      body: _buildBody(),
-    );
+    return PieChartSample2();
+    // return Scaffold(
+    //   appBar: AppBar(
+    //     automaticallyImplyLeading: false,
+    //     backgroundColor: AppColors.mainColor,
+    //     title: Text('Thống kê'),
+    //     // bottom: TabBar(
+    //     //   unselectedLabelColor: Colors.grey,
+    //     //   labelColor: Colors.black,
+    //     //   onTap: (value) {
+    //     //     setState(() {
+    //     //       currentPage = value;
+    //     //     });
+    //     //   },
+    //     //   controller: _tabController,
+    //     //   indicatorColor: Colors.black,
+    //     //   indicatorPadding: EdgeInsets.symmetric(horizontal: 10),
+    //     //   indicatorSize: TabBarIndicatorSize.tab,
+    //     //   indicatorWeight: 1.5,
+    //     //   tabs: [
+    //     //     Tab(
+    //     //       child: Text(
+    //     //         '',
+    //     //         style: TextStyle(fontWeight: FontWeight.bold),
+    //     //       ),
+    //     //     ),
+    //     //     Tab(
+    //     //       child: Text(friendRequest.toUpperCase(),
+    //     //           style: TextStyle(fontWeight: FontWeight.bold)),
+    //     //     )
+    //     //   ],
+    //     // ),
+    //   ),
+    //   // body: _buildBody(),
+    //   body: PieChartSample2(),
+    // );
   }
 
   Widget _buildBody() {

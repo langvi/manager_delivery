@@ -26,3 +26,9 @@ class GetInforSuccess extends ProductState {
 
   GetInforSuccess(this.inforProduct);
 }
+
+class GetInforCustomerSuccess extends ProductState {
+  final CustomerProduct customerProduct;
+
+  GetInforCustomerSuccess(this.customerProduct);
+}
