@@ -4,49 +4,59 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/consts/const.dart';
-import 'package:manage_delivery/features/manager_product/create_product/bloc/create_product_bloc.dart';
 import 'package:manage_delivery/features/manager_product/model/product_response.dart';
+import 'package:manage_delivery/features/manager_product/update_product/bloc/update_bloc.dart';
 
 import '../../../base/view/base_staful_widget.dart';
 import '../../../utils/input_text.dart';
 
-class CreateProductPage extends StatefulWidget {
-  CreateProductPage({Key key}) : super(key: key);
+class UpdatePage extends StatefulWidget {
+  UpdatePage({Key key}) : super(key: key);
 
   @override
-  _CreateProductPageState createState() => _CreateProductPageState();
+  _UpdatePageState createState() => _UpdatePageState();
 }
 
-class _CreateProductPageState
-    extends BaseStatefulWidgetState<CreateProductPage, CreateProductBloc> {
-  TextEditingController nameController = TextEditingController();
-  TextEditingController costController =
-      MoneyMaskedTextController(precision: 0, decimalSeparator: '');
-  TextEditingController cODController =
-      MoneyMaskedTextController(precision: 0, decimalSeparator: '');
-  TextEditingController noteController = TextEditingController();
+class _UpdatePageState extends BaseStatefulWidgetState<UpdatePage, UpdateBloc> {
+  TextEditingController nameController;
+  TextEditingController costController;
+  TextEditingController cODController;
+  TextEditingController noteController;
   final _nameFocus = FocusNode();
   final _costFocus = FocusNode();
   final _cODFocus = FocusNode();
   final _noteFocus = FocusNode();
-  List<Product> products = [];
-  int countValue = 1;
+  Product product;
   final _formKey = GlobalKey<FormState>();
   @override
   void initBloc() {
-    bloc = CreateProductBloc();
+    bloc = UpdateBloc();
   }
 
   @override
   void didChangeDependencies() {
+    if (product == null) {
+      product = ModalRoute.of(context).settings.arguments;
+      nameController = TextEditingController(text: product.nameProduct);
+      costController = MoneyMaskedTextController(
+          initialValue: product.costShip.toDouble(),
+          precision: 0,
+          decimalSeparator: '');
+      cODController = MoneyMaskedTextController(
+          initialValue: product.costProduct.toDouble(),
+          precision: 0,
+          decimalSeparator: '');
+      noteController = TextEditingController(text: product.note);
+    }
+
     super.didChangeDependencies();
   }
 
   @override
   Widget buildWidgets(BuildContext context) {
-    return BlocProvider<CreateProductBloc>(
+    return BlocProvider<UpdateBloc>(
       create: (context) => bloc,
-      child: BlocConsumer<CreateProductBloc, CreateProductState>(
+      child: BlocConsumer<UpdateBloc, UpdateState>(
         listener: (context, state) {},
         builder: (context, state) {
           return Scaffold(
@@ -135,7 +145,6 @@ class _CreateProductPageState
                 filledColor: Colors.white,
               ),
             ),
-            _buildCount(),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
@@ -152,11 +161,6 @@ class _CreateProductPageState
                     hintStyle: TextStyle(color: Colors.grey, fontSize: 14)),
               ),
             ),
-
-            // Padding(
-            //   padding: const EdgeInsets.all(10.0),
-            //   child: _buildButton(),
-            // )
           ],
         ),
       ),
@@ -175,55 +179,18 @@ class _CreateProductPageState
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           onPressed: () {
             if (_formKey.currentState.validate()) {
-              for (int index = 0; index < countValue; index++) {
-                products.add(Product(
-                    nameProduct: nameController.text,
-                    costProduct: parsePrice(costController.text.trim()),
-                    costShip: parsePrice(cODController.text.trim()),
-                    note: noteController.text));
-              }
-              Navigator.pushNamed(context, AppConst.routeCreateAddress,
-                  arguments: products);
+              product.nameProduct = nameController.text;
+              product.costProduct = parsePrice(costController.text.trim());
+              product.costShip = parsePrice(cODController.text.trim());
+              product.note = noteController.text;
+              Navigator.pushNamed(context, AppConst.routeUpdateAddress,
+                  arguments: product);
             }
           },
           child: Text(
             'TIẾP TỤC',
             style: TextStyle(color: Colors.white),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCount() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        padding: EdgeInsets.only(left: 5),
-        decoration: BoxDecoration(
-            border: Border.all(), borderRadius: BorderRadius.circular(10)),
-        child: Row(
-          children: [
-            Text('Chọn số lượng'),
-            const Spacer(),
-            IconButton(
-                icon: Icon(Icons.keyboard_arrow_left),
-                onPressed: () {
-                  countProduct(false);
-                }),
-            const SizedBox(
-              width: 20,
-            ),
-            Text(countValue.toString()),
-            const SizedBox(
-              width: 20,
-            ),
-            IconButton(
-                icon: Icon(Icons.keyboard_arrow_right),
-                onPressed: () {
-                  countProduct(true);
-                }),
-          ],
         ),
       ),
     );
@@ -239,19 +206,5 @@ class _CreateProductPageState
       number = price;
     }
     return int.parse(number);
-  }
-
-  void countProduct(bool isIncrement) {
-    if (countValue > 0) {
-      setState(() {
-        countValue = isIncrement ? countValue += 1 : countValue -= 1;
-      });
-    } else {
-      if (isIncrement) {
-        setState(() {
-          countValue++;
-        });
-      }
-    }
   }
 }

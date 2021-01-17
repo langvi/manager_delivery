@@ -5,8 +5,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:manage_delivery/base/consts/colors.dart';
+import 'package:manage_delivery/base/consts/const.dart';
 import 'package:manage_delivery/base/view/base_staful_widget.dart';
 import 'package:manage_delivery/features/manager_employee/detail_employee/bloc/detail_employee_bloc.dart';
+import 'package:manage_delivery/features/manager_employee/model/employee_response.dart';
+import 'package:manage_delivery/features/manager_product/model/product_response.dart';
+import 'package:manage_delivery/utils/convert_value.dart';
+import 'package:manage_delivery/utils/status_product.dart';
 
 class DetailEmployeePage extends StatefulWidget {
   DetailEmployeePage({Key key}) : super(key: key);
@@ -21,16 +26,24 @@ class _DetailEmployeePageState
   TextEditingController _phoneController = TextEditingController();
   FocusNode _nameFocus = FocusNode();
   FocusNode _phoneFocus = FocusNode();
+  Employee employee;
   bool isChangeName = false;
   bool isChangePhone = false;
   bool isShowList = false;
   bool isShowGetProduct = true;
   String currentTime = '22/2/2021';
+  List<Product> products;
   @override
   void initBloc() {
     bloc = DetailEmployeeBloc();
-    _nameController.text = 'Ha Van SH';
-    _phoneController.text = '01233214856';
+  }
+
+  @override
+  void didChangeDependencies() {
+    employee = ModalRoute.of(context).settings.arguments;
+    _nameController.text = employee.name;
+    _phoneController.text = employee.phoneNumber;
+    super.didChangeDependencies();
   }
 
   @override
@@ -41,7 +54,6 @@ class _DetailEmployeePageState
         listener: (context, state) {},
         builder: (context, state) {
           return Scaffold(
-            // backgroundColor: Colors.grey,
             appBar: AppBar(
               backgroundColor: AppColors.mainColor,
               leading: BackButton(
@@ -65,8 +77,7 @@ class _DetailEmployeePageState
           _buildInfor(),
           Visibility(
             visible: isShowList,
-            child: _buildTitleProduct(
-                isShowGetProduct ? 'Danh sách đơn lấy' : 'Danh sách đơn giao'),
+            child: _buildListProduct(),
           ),
           Visibility(visible: isShowList, child: _buildListProduct())
         ],
@@ -115,19 +126,7 @@ class _DetailEmployeePageState
         ),
         Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: _buildInputPhone()
-            //  RichText(
-            //   text: TextSpan(
-            //       text: 'Số điện thoại: ',
-            //       style: TextStyle(color: Colors.black, fontSize: 16),
-            //       children: [
-            //         TextSpan(
-            //           text: '0214578963',
-            //           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            //         )
-            //       ]),
-            // ),
-            ),
+            child: _buildInputPhone()),
         SizedBox(
           height: 10,
         ),
@@ -142,34 +141,37 @@ class _DetailEmployeePageState
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Expanded(child: _buildItemInfor('Số CMTND', '0236598741')),
-                Expanded(child: _buildItemInfor('Khu vực giao', 'Đống Đa')),
-                Expanded(child: _buildItemInfor('Số ngày công', '22')),
+                _buildItemInfor('Khu vực giao', 'Đống Đa'),
+                _buildItemInfor('Số ngày công', '22'),
               ],
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Text(
-            'Công việc',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+        SizedBox(
+          height: 10,
         ),
+        // Padding(
+        //   padding: const EdgeInsets.all(10.0),
+        //   child: Text(
+        //     'Công việc',
+        //     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        //   ),
+        // ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Row(
-            children: [
-              Expanded(
-                  child:
-                      _buildItemJob(AppColors.gradientGetProduct, 'Lấy hàng')),
-              SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                  child: _buildItemJob(AppColors.gradientShipped, 'Giao hàng')),
-            ],
-          ),
+          child: _buildItemJob(AppColors.gradientGetProduct),
+          // child: Row(
+          //   children: [
+          //     Expanded(
+          //         child:
+          //             _buildItemJob(AppColors.gradientGetProduct, 'Lấy hàng')),
+          //     SizedBox(
+          //       width: 10,
+          //     ),
+          //     Expanded(
+          //         child: _buildItemJob(AppColors.gradientShipped, 'Giao hàng')),
+          //   ],
+          // ),
         )
         // Divider(
         //   thickness: 1,
@@ -178,7 +180,7 @@ class _DetailEmployeePageState
     );
   }
 
-  Widget _buildItemJob(List<Color> colors, String title) {
+  Widget _buildItemJob(List<Color> colors) {
     return Card(
       color: Colors.blue[100],
       margin: EdgeInsets.all(0),
@@ -188,17 +190,10 @@ class _DetailEmployeePageState
         padding: EdgeInsets.all(5),
         child: Column(
           children: [
-            Container(
-              padding: EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: colors),
-                  borderRadius: BorderRadius.circular(10)),
-              child: SvgPicture.asset(
-                'assets/images/product.svg',
-                height: 40,
-              ),
+            Text(
+              'Công việc',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            Text(title),
             SizedBox(
               height: 10,
             ),
@@ -220,7 +215,9 @@ class _DetailEmployeePageState
               },
               child: Container(
                 padding: EdgeInsets.all(5),
-                decoration: BoxDecoration(color: Colors.grey[300]),
+                decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(10)),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -230,7 +227,7 @@ class _DetailEmployeePageState
                       height: 30,
                       child: Icon(
                         isShowList ? AntDesign.caretdown : AntDesign.caretright,
-                        size: 20,
+                        size: 18,
                       ),
                     )
                   ],
@@ -257,8 +254,7 @@ class _DetailEmployeePageState
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          padding: EdgeInsets.all(3),
-          // color: color,
+          padding: EdgeInsets.all(5),
           decoration: BoxDecoration(
               color: color, borderRadius: BorderRadius.circular(10)),
           child: Text(
@@ -279,7 +275,7 @@ class _DetailEmployeePageState
 
   Widget _buildItemInfor(String title, String content) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           title,
@@ -367,9 +363,9 @@ class _DetailEmployeePageState
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: ListView.builder(
-        physics: NeverScrollableScrollPhysics(),
+        itemCount: products.length,
         shrinkWrap: true,
-        itemCount: 10,
+        physics: NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
           return _buildItemProduct(index);
         },
@@ -383,7 +379,7 @@ class _DetailEmployeePageState
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: InkWell(
         onTap: () {
-          // Navigator.pushNamed(context, AppConst.routeDetailProduct);
+          Navigator.pushNamed(context, AppConst.routeDetailProduct);
         },
         child: Container(
           padding: EdgeInsets.all(10),
@@ -409,18 +405,22 @@ class _DetailEmployeePageState
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        RichText(
-                          text: TextSpan(
-                              text: 'Mã đơn hàng: ',
-                              style: TextStyle(color: Colors.black),
-                              children: [
-                                TextSpan(
-                                  text: '5efefe5',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                )
-                              ]),
+                        Expanded(
+                          child: RichText(
+                            text: TextSpan(
+                                text: 'Mã đơn hàng: ',
+                                style: TextStyle(color: Colors.black),
+                                children: [
+                                  TextSpan(
+                                    text: products[index].id,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  )
+                                ]),
+                          ),
                         ),
-                        Text('20/12/2021'),
+                        const SizedBox(width: 5),
+                        Text(convertDateTimeToDay(products[index].createdAt)),
                       ],
                     ),
                     Padding(
@@ -434,13 +434,13 @@ class _DetailEmployeePageState
                                 style: TextStyle(color: Colors.black),
                                 children: [
                                   TextSpan(
-                                    text: 'Hoa',
+                                    text: products[index].sendFrom,
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   )
                                 ]),
                           ),
-                          Text('12:02')
+                          Text(convertDateTimeToHour(products[index].createdAt))
                         ],
                       ),
                     ),
@@ -453,7 +453,7 @@ class _DetailEmployeePageState
                                 style: TextStyle(color: Colors.black),
                                 children: [
                                   TextSpan(
-                                    text: 'Hoa Bằng, Cầu Giấy, Hà Nội',
+                                    text: products[index].addressReceive,
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   )
@@ -464,9 +464,15 @@ class _DetailEmployeePageState
                             padding: EdgeInsets.all(3),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                color: Colors.blue),
+                                color: getColor(
+                                    products[index].statusShip,
+                                    products[index].isSuccess,
+                                    products[index].isEnter)),
                             child: Text(
-                              'fefe',
+                              getStatusOfProduct(
+                                  products[index].statusShip,
+                                  products[index].isSuccess,
+                                  products[index].isEnter),
                               style: TextStyle(color: Colors.white),
                             )),
                       ],
@@ -477,39 +483,6 @@ class _DetailEmployeePageState
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildTitleProduct(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Row(
-        children: [
-          Text(
-            title,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          Spacer(),
-          Text(currentTime),
-          IconButton(
-              icon: Icon(
-                Icons.date_range,
-                color: AppColors.mainColor,
-                size: 26,
-              ),
-              onPressed: () {
-                DatePicker.showDatePicker(context,
-                    showTitleActions: true,
-                    minTime: DateTime(2010, 1, 1),
-                    maxTime: DateTime(2025, 6, 7), onConfirm: (date) {
-                  setState(() {
-                    currentTime = DateFormat('dd/MM/yyy').format(date);
-                  });
-                  // print('confirm $date');
-                }, currentTime: DateTime.now(), locale: LocaleType.vi);
-              })
-        ],
       ),
     );
   }

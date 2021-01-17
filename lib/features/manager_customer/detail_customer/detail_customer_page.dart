@@ -6,6 +6,10 @@ import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/consts/const.dart';
 import 'package:manage_delivery/base/view/base_staful_widget.dart';
 import 'package:manage_delivery/features/manager_customer/detail_customer/bloc/detail_customer_bloc.dart';
+import 'package:manage_delivery/features/manager_customer/model/customer_response.dart';
+import 'package:manage_delivery/features/manager_product/model/product_response.dart';
+import 'package:manage_delivery/utils/convert_value.dart';
+import 'package:manage_delivery/utils/status_product.dart';
 
 class DetailCustomerPage extends StatefulWidget {
   const DetailCustomerPage({Key key}) : super(key: key);
@@ -16,9 +20,24 @@ class DetailCustomerPage extends StatefulWidget {
 
 class _DetailCustomerPageState
     extends BaseStatefulWidgetState<DetailCustomerPage, DetailCustomerBloc> {
+  Customer customer;
+  List<Product> products = [];
+  int totalCreate;
+  int totalGetting;
+  int totalShipping;
+  int totalShiped;
   @override
   void initBloc() {
     bloc = DetailCustomerBloc();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (customer == null) {
+      customer = ModalRoute.of(context).settings.arguments;
+      bloc.add(GetProductByCustomer(customer.id));
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -26,7 +45,20 @@ class _DetailCustomerPageState
     return BlocProvider<DetailCustomerBloc>(
       create: (context) => bloc,
       child: BlocConsumer<DetailCustomerBloc, DetailCustomerState>(
-        listener: (context, state) {},
+        listener: (context, state) {
+          if (state is Loading) {
+            isShowLoading = true;
+          } else if (state is GetProductSuccess) {
+            isShowLoading = false;
+            products = state.products;
+            totalCreate = state.totalCreate;
+            totalGetting = state.totalGetting;
+            totalShipping = state.totalShipping;
+            totalShiped = state.totalShiped;
+          } else if (state is Error) {
+            isShowLoading = false;
+          }
+        },
         builder: (context, state) {
           return baseShowLoading(
               child: Scaffold(
@@ -107,7 +139,7 @@ class _DetailCustomerPageState
                   width: 10,
                 ),
                 Text(
-                  'SDHSJDS',
+                  customer.name,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 Spacer(),
@@ -130,7 +162,7 @@ class _DetailCustomerPageState
                   width: 10,
                 ),
                 Text(
-                  '0254879631',
+                  customer.phoneNumber,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 )
               ],
@@ -159,7 +191,7 @@ class _DetailCustomerPageState
                   width: 10,
                 ),
                 Text(
-                  '30 Vân Canh, Hoài Đức, Hà Nội',
+                  customer.address,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 )
               ],
@@ -179,10 +211,10 @@ class _DetailCustomerPageState
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildItemInfor('Đã tạo', 45, Colors.orange),
-        _buildItemInfor('Đang lấy hàng', 10, Colors.green),
-        _buildItemInfor('Đang giao', 5, Colors.blue),
-        _buildItemInfor('Đã giao', 30, AppColors.mainColor),
+        _buildItemInfor('Đã tạo', totalCreate, Colors.orange),
+        _buildItemInfor('Đang lấy hàng', totalGetting, Colors.green),
+        _buildItemInfor('Đang giao', totalShipping, Colors.blue),
+        _buildItemInfor('Đã giao', totalShiped, AppColors.mainColor),
       ],
     );
   }
@@ -207,11 +239,10 @@ class _DetailCustomerPageState
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: ListView.builder(
-        itemCount: 10,
+        itemCount: products.length,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
-          // return ListTile(title: Text(products[index].nameProduct));
           return _buildItemProduct(index);
         },
       ),
@@ -250,18 +281,22 @@ class _DetailCustomerPageState
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        RichText(
-                          text: TextSpan(
-                              text: 'Mã đơn hàng: ',
-                              style: TextStyle(color: Colors.black),
-                              children: [
-                                TextSpan(
-                                  text: '5efefe5',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                )
-                              ]),
+                        Expanded(
+                          child: RichText(
+                            text: TextSpan(
+                                text: 'Mã đơn hàng: ',
+                                style: TextStyle(color: Colors.black),
+                                children: [
+                                  TextSpan(
+                                    text: products[index].id,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  )
+                                ]),
+                          ),
                         ),
-                        Text('20/12/2021'),
+                        const SizedBox(width: 5),
+                        Text(convertDateTimeToDay(products[index].createdAt)),
                       ],
                     ),
                     Padding(
@@ -275,13 +310,13 @@ class _DetailCustomerPageState
                                 style: TextStyle(color: Colors.black),
                                 children: [
                                   TextSpan(
-                                    text: 'Hoa',
+                                    text: products[index].sendFrom,
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   )
                                 ]),
                           ),
-                          Text('12:02')
+                          Text(convertDateTimeToHour(products[index].createdAt))
                         ],
                       ),
                     ),
@@ -294,7 +329,7 @@ class _DetailCustomerPageState
                                 style: TextStyle(color: Colors.black),
                                 children: [
                                   TextSpan(
-                                    text: 'Hoa Bằng, Cầu Giấy, Hà Nội',
+                                    text: products[index].addressReceive,
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   )
@@ -305,9 +340,15 @@ class _DetailCustomerPageState
                             padding: EdgeInsets.all(3),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                color: Colors.blue),
+                                color: getColor(
+                                    products[index].statusShip,
+                                    products[index].isSuccess,
+                                    products[index].isEnter)),
                             child: Text(
-                              'fefe',
+                              getStatusOfProduct(
+                                  products[index].statusShip,
+                                  products[index].isSuccess,
+                                  products[index].isEnter),
                               style: TextStyle(color: Colors.white),
                             )),
                       ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/consts/const.dart';
 import 'package:manage_delivery/base/view/base_staful_widget.dart';
 import 'package:manage_delivery/features/login/bloc/login_bloc.dart';
@@ -76,6 +77,7 @@ class _LoginPageState extends BaseStatefulWidgetState<LoginPage, LoginBloc> {
                       hintText: 'Tên đăng nhập',
                       iconNextTextInputAction: TextInputAction.next,
                       controller: userNameController,
+                      filledColor: Colors.grey[300],
                       currentNode: _userNameFocus,
                       nextNode: _passwordFocus,
                       validator: (value) {
@@ -92,6 +94,7 @@ class _LoginPageState extends BaseStatefulWidgetState<LoginPage, LoginBloc> {
                       obscureText: true,
                       hintText: 'Mật khẩu',
                       controller: passwordController,
+                      filledColor: Colors.grey[300],
                       currentNode: _passwordFocus,
                       iconNextTextInputAction: TextInputAction.done,
                       validator: (value) {
@@ -103,33 +106,39 @@ class _LoginPageState extends BaseStatefulWidgetState<LoginPage, LoginBloc> {
                       },
                     ),
                   ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: InkWell(
-                        onTap: () {
-                          // Navigator.pushNamed(
-                          //     context, AppConst.routeForgotPassword);
-                        },
-                        child: Text(
-                          'Quên mật khẩu',
-                          style: TextStyle(
-                              decoration: TextDecoration.underline,
-                              color: Colors.blue),
-                        )),
-                  ),
+                  // Align(
+                  //   alignment: Alignment.centerRight,
+                  //   child: InkWell(
+                  //       onTap: () {
+                  //         // Navigator.pushNamed(
+                  //         //     context, AppConst.routeForgotPassword);
+                  //       },
+                  //       child: Text(
+                  //         'Quên mật khẩu',
+                  //         style: TextStyle(
+                  //             decoration: TextDecoration.underline,
+                  //             color: Colors.blue),
+                  //       )),
+                  // ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 150, bottom: 10),
+                    padding: const EdgeInsets.only(top: 50, bottom: 10),
                     child: Container(
                         width: double.infinity,
                         height: 50,
                         child: RaisedButton(
+                          color: AppColors.mainColor,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
                           onPressed: () {
                             if (_formKey.currentState.validate()) {
                               bloc.add(Login(userNameController.text.trim(),
                                   passwordController.text.trim()));
                             }
                           },
-                          child: Text('Đăng nhập'.toUpperCase()),
+                          child: Text(
+                            'Đăng nhập'.toUpperCase(),
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
                         )),
                   ),
                 ],

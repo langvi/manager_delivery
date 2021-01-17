@@ -58,6 +58,13 @@ class _ProductPageState
           } else if (state is GetInforSuccess) {
             isShowLoading = false;
             inforProduct = state.inforProduct;
+          } else if (state is GetInforCustomerSuccess) {
+            isShowLoading = false;
+            Navigator.pushNamed(context, AppConst.routeDetailProduct,
+                arguments: {
+                  'product': state.product,
+                  'inforCus': state.customerProduct
+                });
           } else if (state is Error) {}
         },
         builder: (context, state) {
@@ -132,8 +139,8 @@ class _ProductPageState
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildItem('Tất cả ', inforProduct.totalProduct,
-                AppColors.gradientAll),
+            _buildItem(
+                'Tất cả ', inforProduct.totalProduct, AppColors.gradientAll),
             SizedBox(
               width: 5,
             ),
@@ -147,8 +154,8 @@ class _ProductPageState
             SizedBox(
               width: 5,
             ),
-            _buildItem('Đã giao', inforProduct.totalShiped,
-                AppColors.gradientShipped),
+            _buildItem(
+                'Đã giao', inforProduct.totalShiped, AppColors.gradientShipped),
           ],
         ),
       ),
@@ -276,8 +283,7 @@ class _ProductPageState
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, AppConst.routeDetailProduct,
-              arguments: products[index]);
+          bloc.add(GetInforCustomer(products[index]));
         },
         child: Container(
           padding: EdgeInsets.all(10),

@@ -13,6 +13,7 @@ class BuildTextInput extends StatefulWidget {
   final FocusNode nextNode;
 
   final bool obscureText;
+  final bool isShowLabel;
   final bool isBorderFocus;
 
   final String isStringEmpty;
@@ -33,6 +34,7 @@ class BuildTextInput extends StatefulWidget {
   final int maxLengthInputForm;
 
   final bool isReadOnly;
+  final bool isShowSuffixText;
   final bool isBorder;
   final List<TextInputFormatter> inputFormatters;
 
@@ -42,6 +44,8 @@ class BuildTextInput extends StatefulWidget {
     this.currentNode,
     this.iconLeading,
     this.submitFunc,
+    this.isShowLabel = false,
+    this.isShowSuffixText = false,
     this.nextNode,
     this.obscureText = false,
     this.isStringEmpty,
@@ -109,6 +113,7 @@ class _BuildInputTextState extends State<BuildTextInput> {
         decoration: InputDecoration(
           filled: true,
           fillColor: widget.filledColor,
+          labelText: widget.isShowLabel ? widget.hintText : null,
           hintStyle: TextStyle(
             fontSize: 14,
             color: Colors.black54,
@@ -119,6 +124,7 @@ class _BuildInputTextState extends State<BuildTextInput> {
               : null,
           prefixStyle:
               TextStyle(color: Colors.red, backgroundColor: Colors.white),
+          suffixText: widget.isShowSuffixText ? 'VNĐ' : null,
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(widget.borderRadius),
               borderSide: widget.isBorder

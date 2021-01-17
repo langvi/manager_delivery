@@ -6,6 +6,8 @@ import 'package:manage_delivery/features/manager_product/address/address_page.da
 import 'package:manage_delivery/features/manager_product/create_product/create_product_page.dart';
 import 'package:manage_delivery/features/manager_product/detail_product/detail_product_page.dart';
 import 'package:manage_delivery/features/manager_product/enter_product/enter_product_page.dart';
+import 'package:manage_delivery/features/manager_product/update_address/update_address_page.dart';
+import 'package:manage_delivery/features/manager_product/update_product/update_page.dart';
 import 'package:manage_delivery/utils/key_board.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -82,6 +84,10 @@ class _MyAppState extends State<MyApp> {
         return DetailEmployeePage();
       case AppConst.routeEnterProduct:
         return EnterProductPage();
+      case AppConst.routeUpdateProduct:
+        return UpdatePage();
+      case AppConst.routeUpdateAddress:
+        return UpdateAddressPage();
     }
     return null;
   }

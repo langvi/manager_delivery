@@ -13,7 +13,7 @@ class GetAllProduct extends ProductEvent {
 class GetInforProduct extends ProductEvent {}
 
 class GetInforCustomer extends ProductEvent {
-  final String idProduct;
+  final Product product;
 
-  GetInforCustomer(this.idProduct);
+  GetInforCustomer(this.product);
 }

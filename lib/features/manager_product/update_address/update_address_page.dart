@@ -2,22 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/view/base_staful_widget.dart';
-import 'package:manage_delivery/features/manager_product/address/bloc/address_bloc.dart';
 import 'package:manage_delivery/features/manager_product/model/product_response.dart';
+import 'package:manage_delivery/features/manager_product/update_address/bloc/update_address_bloc.dart';
 import 'package:manage_delivery/utils/dialog.dart';
 import 'package:manage_delivery/utils/input_text.dart';
 import 'package:manage_delivery/utils/style_text.dart';
 import 'package:manage_delivery/utils/validator.dart';
 
-class AddressPage extends StatefulWidget {
-  AddressPage({Key key}) : super(key: key);
+class UpdateAddressPage extends StatefulWidget {
+  UpdateAddressPage({Key key}) : super(key: key);
 
   @override
-  _AddressPageState createState() => _AddressPageState();
+  _UpdateAddressPageState createState() => _UpdateAddressPageState();
 }
 
-class _AddressPageState
-    extends BaseStatefulWidgetState<AddressPage, AddressBloc> {
+class _UpdateAddressPageState
+    extends BaseStatefulWidgetState<UpdateAddressPage, UpdateAddressBloc> {
   TextEditingController nameReceiveController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController detailAddressCtr = TextEditingController();
@@ -30,31 +30,35 @@ class _AddressPageState
   String currentVillage;
   bool isSend = true;
   // List<String> provinces = ['Hà Nội', 'Lạng Sơn', 'Bắc Ninh', 'Thái Nguyên'];
-  List<Product> products = [];
+  Product product;
   final _formKey = GlobalKey<FormState>();
   @override
   void initBloc() {
-    bloc = AddressBloc();
+    bloc = UpdateAddressBloc();
   }
 
   @override
   void didChangeDependencies() {
-    products = ModalRoute.of(context).settings.arguments;
-
+    if (product == null) {
+      product = ModalRoute.of(context).settings.arguments;
+      nameReceiveController.text = product.sendFrom;
+      phoneController.text = product.phoneSend;
+      detailAddressCtr.text = getAddressUpdate(product.addressSend);
+    }
     super.didChangeDependencies();
   }
 
   @override
   Widget buildWidgets(BuildContext context) {
-    return BlocProvider<AddressBloc>(
+    return BlocProvider<UpdateAddressBloc>(
       create: (context) => bloc,
-      child: BlocConsumer<AddressBloc, AddressState>(
+      child: BlocConsumer<UpdateAddressBloc, UpdateAddressState>(
         listener: (context, state) {
           if (state is Loading) {
             isShowLoading = true;
-          } else if (state is CreateProductSuccess) {
+          } else if (state is Success) {
             isShowLoading = false;
-            ShowDialog(context).showNotification('Tạo đơn hàng thành công');
+            ShowDialog(context).showNotification('Cập nhật thành công');
           } else if (state is Error) {
             isShowLoading = false;
           }
@@ -227,21 +231,20 @@ class _AddressPageState
             if (_formKey.currentState.validate()) {
               if (isValidAddress()) {
                 if (isSend) {
-                  products.forEach((element) {
-                    element.addressSend = getAddress();
-                    element.phoneSend = phoneController.text;
-                    element.sendFrom = nameReceiveController.text;
-                  });
+                  product.addressSend = getAddress();
+                  product.phoneSend = phoneController.text;
+                  product.sendFrom = nameReceiveController.text;
                 } else {
-                  products.forEach((element) {
-                    element.addressReceive = getAddress();
-                    element.phoneReceive = phoneController.text;
-                    element.receiveBy = nameReceiveController.text;
-                    bloc.add(CreateProduct(element));
-                  });
+                  product.addressReceive = getAddress();
+                  product.phoneReceive = phoneController.text;
+                  product.receiveBy = nameReceiveController.text;
+                  bloc.add(UpdateProduct(product));
                 }
                 setState(() {
                   isSend = false;
+                  nameReceiveController.text = product.receiveBy;
+                  phoneController.text = product.phoneReceive;
+                  detailAddressCtr.text = product.addressReceive;
                 });
               }
             }
@@ -271,6 +274,22 @@ class _AddressPageState
         currentProvince;
   }
 
+  void setAddress(String address) {
+    if (address.contains(',')) {
+      var str = address.split(',');
+      currentProvince = str[2];
+      currentDistrict = str[1];
+      currentVillage = str[0];
+    }
+  }
+
+  String getAddressUpdate(String value) {
+    if (!value.contains(',')) {
+      return value;
+    }
+    return value.split(',').first;
+  }
+
   String getValue(int type) {
     switch (type) {
       case 0:
@@ -283,6 +302,7 @@ class _AddressPageState
         break;
       default:
     }
+    return null;
   }
 
   String getTitle(String content) {

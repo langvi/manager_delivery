@@ -1,18 +1,35 @@
 import 'dart:async';
 
 import 'package:manage_delivery/base/bloc/base_bloc.dart';
+import 'package:manage_delivery/features/manager_customer/model/customer_repository.dart';
+import 'package:manage_delivery/features/manager_product/model/product_response.dart';
 import 'package:meta/meta.dart';
 
 part 'detail_customer_event.dart';
 part 'detail_customer_state.dart';
 
-class DetailCustomerBloc extends BaseBloc<DetailCustomerEvent, DetailCustomerState> {
+class DetailCustomerBloc
+    extends BaseBloc<DetailCustomerEvent, DetailCustomerState> {
   DetailCustomerBloc() : super(DetailCustomerInitial());
-
+  final _customerRepository = CustomerRepository();
   @override
   Stream<DetailCustomerState> mapEventToState(
     DetailCustomerEvent event,
   ) async* {
-    // TODO: implement mapEventToState
+    if (event is GetProductByCustomer) {
+      yield Loading();
+      var res =
+          await _customerRepository.getProductbyCustomer(event.customerId);
+      if (res.isSuccess) {
+        yield GetProductSuccess(
+            products: res.data.products,
+            totalCreate: res.data.totalCreate,
+            totalGetting: res.data.totalGetting,
+            totalShiped: res.data.totalShiped,
+            totalShipping: res.data.totalShipping);
+      } else {
+        yield Error();
+      }
+    }
   }
 }

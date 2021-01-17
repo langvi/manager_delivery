@@ -94,13 +94,6 @@ class _CustomerPageState
                                         size: 20,
                                       ),
                                       onPressed: () {}),
-                                  // IconButton(
-                                  //     icon: Icon(
-                                  //       MaterialCommunityIcons.filter_variant,
-                                  //       color: Colors.white,
-                                  //       size: 20,
-                                  //     ),
-                                  //     onPressed: () {}),
                                 ],
                               ),
                               Visibility(
@@ -248,7 +241,8 @@ class _CustomerPageState
       elevation: 5,
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, AppConst.routeDetailCustomer);
+          Navigator.pushNamed(context, AppConst.routeDetailCustomer,
+              arguments: customers[index]);
         },
         child: Container(
           padding: EdgeInsets.all(5),

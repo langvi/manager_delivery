@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 
-String convertMoney(double value) {
+String convertMoney(int value) {
   final currencyFormatter =
       NumberFormat.currency(locale: 'vi', decimalDigits: 0, symbol: 'VNĐ');
   return currencyFormatter.format(value);

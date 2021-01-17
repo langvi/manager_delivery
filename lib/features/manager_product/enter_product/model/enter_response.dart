@@ -14,6 +14,6 @@ class EnterResponse {
   factory EnterResponse.fromJson(Map<String, dynamic> json) => EnterResponse(
         message: json["message"],
         isSuccess: json["isSuccess"],
-        data: Product.fromJson(json['data']),
+        data: json['data'] != null ? Product.fromJson(json['data']) : Product(),
       );
 }

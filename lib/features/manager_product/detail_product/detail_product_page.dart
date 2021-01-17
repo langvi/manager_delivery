@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:manage_delivery/base/consts/colors.dart';
+import 'package:manage_delivery/base/consts/const.dart';
 import 'package:manage_delivery/base/view/base_staful_widget.dart';
 import 'package:manage_delivery/features/manager_product/detail_product/bloc/detail_product_bloc.dart';
+import 'package:manage_delivery/features/manager_product/model/infor_response.dart';
 import 'package:manage_delivery/features/manager_product/model/product_response.dart';
 import 'package:manage_delivery/utils/convert_value.dart';
 import 'package:manage_delivery/utils/status_product.dart';
@@ -18,6 +20,7 @@ class DetailProductPage extends StatefulWidget {
 class _DetailProductPageState
     extends BaseStatefulWidgetState<DetailProductPage, DetailProductBloc> {
   Product product;
+  CustomerProduct customer;
   @override
   void initBloc() {
     bloc = DetailProductBloc();
@@ -25,7 +28,9 @@ class _DetailProductPageState
 
   @override
   void didChangeDependencies() {
-    product = ModalRoute.of(context).settings.arguments;
+    Map<String, dynamic> data = ModalRoute.of(context).settings.arguments;
+    product = data['product'];
+    customer = data['inforCus'];
     super.didChangeDependencies();
   }
 
@@ -93,7 +98,7 @@ class _DetailProductPageState
                 style: TextStyle(color: Colors.black),
                 children: [
                   TextSpan(
-                    text: 'AJJHS',
+                    text: customer.name,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   )
                 ]),
@@ -109,7 +114,7 @@ class _DetailProductPageState
                   style: TextStyle(color: Colors.black),
                   children: [
                     TextSpan(
-                      text: '0123546987',
+                      text: customer.phone,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     )
                   ]),
@@ -124,7 +129,7 @@ class _DetailProductPageState
                 style: TextStyle(color: Colors.black),
                 children: [
                   TextSpan(
-                    text: '30 Vân Canh, Hoài Đức, Hà Nội',
+                    text: customer.address,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   )
                 ]),
@@ -359,9 +364,16 @@ class _DetailProductPageState
   Widget _popUpMenu() {
     return PopupMenuButton(onSelected: (value) {
       if (value == 1) {
-        print('Cap nhat');
+        if (getStatusOfProduct(
+                product.statusShip, product.isSuccess, product.isEnter) !=
+            'Đã giao') {
+          Navigator.pushNamed(context, AppConst.routeUpdateProduct,
+              arguments: product);
+        }
       } else {
-        print('Xóa');
+        if (product.statusShip != 2) {
+          print('Xóa');
+        }
       }
     }, itemBuilder: (context) {
       var list = List<PopupMenuEntry<Object>>();

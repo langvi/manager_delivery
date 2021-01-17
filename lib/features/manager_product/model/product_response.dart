@@ -55,10 +55,10 @@ class Product {
   DateTime enterAt;
   DateTime shippingAt;
   DateTime shipedAt;
-  double costShip;
+  int costShip;
   bool isSuccess;
   bool isEnter;
-  double costProduct;
+  int costProduct;
   int statusShip;
   DateTime createdAt;
   String id;
@@ -71,8 +71,8 @@ class Product {
         addressSend: json["addressSend"],
         addressReceive: json["addressSend"],
         isEnter: json["isEnter"],
-        costShip: json["costShip"].toDouble(),
-        costProduct: json["costProduct"].toDouble(),
+        costShip: json["costShip"],
+        costProduct: json["costProduct"],
         phoneReceive: json['phoneReceive'],
         shipedAt:
             json['shipedAt'] != null ? DateTime.parse(json['shipedAt']) : null,
