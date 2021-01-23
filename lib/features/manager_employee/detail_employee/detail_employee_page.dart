@@ -32,7 +32,7 @@ class _DetailEmployeePageState
   bool isShowList = false;
   bool isShowGetProduct = true;
   String currentTime = '22/2/2021';
-  List<Product> products;
+  List<Product> products = [];
   @override
   void initBloc() {
     bloc = DetailEmployeeBloc();
@@ -87,13 +87,20 @@ class _DetailEmployeePageState
 
   Widget _buildAvatar() {
     return Container(
-      color: Colors.grey,
-      child: Image.asset(
-        'assets/images/no_avatar.png',
-        fit: BoxFit.contain,
-        width: double.infinity,
-        height: MediaQuery.of(context).size.height * 0.3,
-      ),
+      color: Colors.grey[300],
+      child: employee.avatarUrl.isNotEmpty
+          ? Image.network(
+              AppConst.baseImageUrl + employee.avatarUrl,
+              fit: BoxFit.contain,
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.3,
+            )
+          : Image.asset(
+              'assets/images/no_avatar.png',
+              fit: BoxFit.contain,
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.3,
+            ),
     );
   }
 
@@ -131,17 +138,17 @@ class _DetailEmployeePageState
           height: 10,
         ),
         Card(
-          color: Colors.orange[200],
+          color: Colors.blue[100],
           margin: EdgeInsets.symmetric(horizontal: 10),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          elevation: 5,
+          elevation: 0,
           child: Container(
             padding: EdgeInsets.all(10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildItemInfor('Khu vực giao', 'Đống Đa'),
+                _buildItemInfor('Khu vực giao', employee.shipArea),
                 _buildItemInfor('Số ngày công', '22'),
               ],
             ),
@@ -184,15 +191,30 @@ class _DetailEmployeePageState
     return Card(
       color: Colors.blue[100],
       margin: EdgeInsets.all(0),
-      elevation: 5,
+      elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Container(
         padding: EdgeInsets.all(5),
         child: Column(
           children: [
-            Text(
-              'Công việc',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                SizedBox(
+                  width: 30,
+                ),
+                Text(
+                  'Số đơn giao: 21',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Spacer(),
+                Text('20/12/2021'),
+                IconButton(
+                    icon: Icon(
+                      FontAwesome.calendar,
+                      color: Colors.black,
+                    ),
+                    onPressed: null)
+              ],
             ),
             SizedBox(
               height: 10,
@@ -203,7 +225,7 @@ class _DetailEmployeePageState
                   child: _buildText('Thành công', '20', AppColors.mainColor),
                 ),
                 Expanded(
-                  child: _buildText('Thất bại', '20', Colors.red),
+                  child: _buildText('Thất bại', '1', Colors.red),
                 )
               ],
             ),
@@ -214,9 +236,9 @@ class _DetailEmployeePageState
                 });
               },
               child: Container(
-                padding: EdgeInsets.all(5),
+                padding: EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: Colors.grey[200],
                     borderRadius: BorderRadius.circular(10)),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -460,19 +482,20 @@ class _DetailEmployeePageState
                                 ]),
                           ),
                         ),
+                        SizedBox(
+                          width: 5,
+                        ),
                         Container(
                             padding: EdgeInsets.all(3),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 color: getColor(
-                                    products[index].statusShip,
-                                    products[index].isSuccess,
-                                    products[index].isEnter)),
+                                  products[index].status,
+                                )),
                             child: Text(
                               getStatusOfProduct(
-                                  products[index].statusShip,
-                                  products[index].isSuccess,
-                                  products[index].isEnter),
+                                products[index].status,
+                              ),
                               style: TextStyle(color: Colors.white),
                             )),
                       ],

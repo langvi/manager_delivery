@@ -10,7 +10,11 @@ class GetAllProduct extends ProductEvent {
   GetAllProduct({this.isLoadMore = false, this.isRefresh = false});
 }
 
-class GetInforProduct extends ProductEvent {}
+class GetInforProduct extends ProductEvent {
+  final bool isRefresh;
+
+  GetInforProduct({this.isRefresh = false});
+}
 
 class GetInforCustomer extends ProductEvent {
   final Product product;

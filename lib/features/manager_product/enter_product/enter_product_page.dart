@@ -32,6 +32,7 @@ class _EnterProductPageState
 
   @override
   Widget buildWidgets(BuildContext context) {
+    sortByTime();
     return BlocProvider<EnterBloc>(
       create: (context) => bloc,
       child: BlocConsumer<EnterBloc, EnterState>(
@@ -117,8 +118,9 @@ class _EnterProductPageState
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
                       gradient: LinearGradient(
-                          colors: getGradient(products[index].statusShip,
-                              products[index].isSuccess)),
+                          colors: getGradient(
+                        products[index].status,
+                      )),
                       shape: BoxShape.circle),
                   child: SvgPicture.asset(
                     'assets/images/product.svg',
@@ -190,19 +192,20 @@ class _EnterProductPageState
                                 ]),
                           ),
                         ),
+                        SizedBox(
+                          width: 5,
+                        ),
                         Container(
                             padding: EdgeInsets.all(3),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 color: getColor(
-                                    products[index].statusShip,
-                                    products[index].isSuccess,
-                                    products[index].isEnter)),
+                                  products[index].status,
+                                )),
                             child: Text(
                               getStatusOfProduct(
-                                  products[index].statusShip,
-                                  products[index].isSuccess,
-                                  products[index].isEnter),
+                                products[index].status,
+                              ),
                               style: TextStyle(color: Colors.white),
                             )),
                       ],
@@ -215,5 +218,11 @@ class _EnterProductPageState
         ),
       ),
     );
+  }
+
+  void sortByTime() {
+    products.sort((value1, value2) {
+      return value2.enterAt.compareTo(value1.enterAt);
+    });
   }
 }

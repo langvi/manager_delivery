@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/consts/const.dart';
 import 'package:manage_delivery/base/view/base_staful_widget.dart';
+import 'package:manage_delivery/base/view/base_widget.dart';
 import 'package:manage_delivery/features/manager_employee/bloc/employee_bloc.dart';
 import 'package:manage_delivery/features/manager_employee/model/employee_response.dart';
 import 'package:manage_delivery/utils/dialog.dart';
@@ -68,6 +69,7 @@ class _EmployeePageState
 
   Widget _buildBody() {
     return SmartRefresher(
+      footer: BaseWidget.buildFooter(),
       controller: _refreshController,
       enablePullDown: true,
       enablePullUp: true,
@@ -145,7 +147,8 @@ class _EmployeePageState
   Widget _buildItem(int index) {
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, AppConst.routeDetailShipper);
+        Navigator.pushNamed(context, AppConst.routeDetailShipper,
+            arguments: employees[index]);
       },
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -163,8 +166,6 @@ class _EmployeePageState
                   child: employees[index].avatarUrl.isNotEmpty
                       ? Image.network(
                           AppConst.baseImageUrl + employees[index].avatarUrl,
-                          // height: double.infinity,
-                          // width: double.infinity,
                           fit: BoxFit.cover,
                         )
                       : Container(

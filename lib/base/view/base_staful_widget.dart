@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:manage_delivery/base/bloc/base_bloc.dart';
+import 'package:manage_delivery/utils/dialog.dart';
 
 abstract class BaseStatefulWidgetState<SF extends StatefulWidget,
     B extends BaseBloc> extends State<SF> {
@@ -50,8 +51,7 @@ abstract class BaseStatefulWidgetState<SF extends StatefulWidget,
     setState(() {
       setShowLoading(false);
     });
-
-    // showPopup.showDialogNotification(error.toString());
+    ShowDialog(context).showNotification(error.toString());
   }
 
   Widget baseShowLoading({@required Widget child}) {

@@ -38,7 +38,7 @@ class _UpdatePageState extends BaseStatefulWidgetState<UpdatePage, UpdateBloc> {
     if (product == null) {
       product = ModalRoute.of(context).settings.arguments;
       nameController = TextEditingController(text: product.nameProduct);
-      costController = MoneyMaskedTextController(
+      costController = MoneyMaskedTextController( 
           initialValue: product.costShip.toDouble(),
           precision: 0,
           decimalSeparator: '');

@@ -42,6 +42,7 @@ class _DetailCustomerPageState
 
   @override
   Widget buildWidgets(BuildContext context) {
+    sortByTime();
     return BlocProvider<DetailCustomerBloc>(
       create: (context) => bloc,
       child: BlocConsumer<DetailCustomerBloc, DetailCustomerState>(
@@ -336,19 +337,20 @@ class _DetailCustomerPageState
                                 ]),
                           ),
                         ),
+                        SizedBox(
+                          width: 5,
+                        ),
                         Container(
                             padding: EdgeInsets.all(3),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 color: getColor(
-                                    products[index].statusShip,
-                                    products[index].isSuccess,
-                                    products[index].isEnter)),
+                                  products[index].status,
+                                )),
                             child: Text(
                               getStatusOfProduct(
-                                  products[index].statusShip,
-                                  products[index].isSuccess,
-                                  products[index].isEnter),
+                                products[index].status,
+                              ),
                               style: TextStyle(color: Colors.white),
                             )),
                       ],
@@ -361,5 +363,11 @@ class _DetailCustomerPageState
         ),
       ),
     );
+  }
+
+  void sortByTime() {
+    products.sort((value1, value2) {
+      return value2.createdAt.compareTo(value1.createdAt);
+    });
   }
 }

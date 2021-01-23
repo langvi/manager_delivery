@@ -45,9 +45,10 @@ class _LoginPageState extends BaseStatefulWidgetState<LoginPage, LoginBloc> {
           }
         },
         builder: (context, state) {
-          return Scaffold(
-            // body: PieChartSample2(),
-            body: _buildBody(),
+          return baseShowLoading(
+            child: Scaffold(
+              body: _buildBody(),
+            ),
           );
         },
       ),

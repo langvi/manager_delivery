@@ -249,23 +249,8 @@ class _DetailProductPageState
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 10),
-          child: _getTimeShipped(product.statusShip, product.isSuccess),
+          child: _getTimeShipped(product.status),
         ),
-        // Padding(
-        //   padding: const EdgeInsets.only(bottom: 10),
-        //   child: Row(
-        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //     children: [
-        //       Text('Thời gian nhập:'),
-        //       Text(
-        //         product.enterAt != null
-        //             ? convertDateTimeToString(product.enterAt)
-        //             : 'Chưa nhập',
-        //         style: TextStyle(fontWeight: FontWeight.bold),
-        //       ),
-        //     ],
-        //   ),
-        // ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -305,8 +290,8 @@ class _DetailProductPageState
     );
   }
 
-  Widget _getTimeShipped(int status, bool isSuccess) {
-    if (status == 1 && isSuccess) {
+  Widget _getTimeShipped(int status) {
+    if (status == 4) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -329,6 +314,9 @@ class _DetailProductPageState
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
+          ),
+          SizedBox(
+            height: 10,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -354,7 +342,8 @@ class _DetailProductPageState
         Text('Trạng thái:'),
         Text(
           getStatusOfProduct(
-              product.statusShip, product.isSuccess, product.isEnter),
+            product.status,
+          ),
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ],
@@ -365,13 +354,14 @@ class _DetailProductPageState
     return PopupMenuButton(onSelected: (value) {
       if (value == 1) {
         if (getStatusOfProduct(
-                product.statusShip, product.isSuccess, product.isEnter) !=
+              product.status,
+            ) !=
             'Đã giao') {
           Navigator.pushNamed(context, AppConst.routeUpdateProduct,
               arguments: product);
         }
       } else {
-        if (product.statusShip != 2) {
+        if (product.status != 2) {
           print('Xóa');
         }
       }

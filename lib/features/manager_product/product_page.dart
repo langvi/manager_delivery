@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/view/base_staful_widget.dart';
+import 'package:manage_delivery/base/view/base_widget.dart';
 import 'package:manage_delivery/features/manager_product/bloc/product_bloc.dart';
 import 'package:manage_delivery/features/manager_product/model/infor_response.dart';
 import 'package:manage_delivery/features/manager_product/model/product_response.dart';
@@ -253,6 +254,7 @@ class _ProductPageState
 
   Widget _buildListProduct() {
     return SmartRefresher(
+      footer: BaseWidget.buildFooter(),
       scrollController: _scrollController,
       controller: _refreshController,
       enablePullDown: true,
@@ -262,6 +264,7 @@ class _ProductPageState
       },
       onRefresh: () {
         bloc.add(GetAllProduct(isRefresh: true));
+        bloc.add(GetInforProduct(isRefresh: true));
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -293,8 +296,9 @@ class _ProductPageState
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
                       gradient: LinearGradient(
-                          colors: getGradient(products[index].statusShip,
-                              products[index].isSuccess)),
+                          colors: getGradient(
+                        products[index].status,
+                      )),
                       shape: BoxShape.circle),
                   child: SvgPicture.asset(
                     'assets/images/product.svg',
@@ -366,19 +370,20 @@ class _ProductPageState
                                 ]),
                           ),
                         ),
+                        SizedBox(
+                          width: 5,
+                        ),
                         Container(
                             padding: EdgeInsets.all(3),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 color: getColor(
-                                    products[index].statusShip,
-                                    products[index].isSuccess,
-                                    products[index].isEnter)),
+                                  products[index].status,
+                                )),
                             child: Text(
                               getStatusOfProduct(
-                                  products[index].statusShip,
-                                  products[index].isSuccess,
-                                  products[index].isEnter),
+                                products[index].status,
+                              ),
                               style: TextStyle(color: Colors.white),
                             )),
                       ],

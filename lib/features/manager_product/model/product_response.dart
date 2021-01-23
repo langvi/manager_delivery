@@ -1,3 +1,5 @@
+import 'package:manage_delivery/utils/convert_value.dart';
+
 class ProductResponse {
   ProductResponse({
     this.message,
@@ -31,14 +33,12 @@ class Product {
       this.addressSend,
       this.costShip,
       this.costProduct,
-      this.statusShip,
+      this.status,
       this.createdAt,
       this.id,
       this.addressReceive,
       this.enterAt,
-      this.isSuccess,
       this.note,
-      this.isEnter,
       this.phoneSend,
       this.phoneReceive,
       this.shipedAt,
@@ -56,10 +56,8 @@ class Product {
   DateTime shippingAt;
   DateTime shipedAt;
   int costShip;
-  bool isSuccess;
-  bool isEnter;
   int costProduct;
-  int statusShip;
+  int status;
   DateTime createdAt;
   String id;
 
@@ -67,23 +65,23 @@ class Product {
         nameProduct: json["nameProduct"],
         sendFrom: json["sendFrom"],
         receiveBy: json["receiveBy"],
-        isSuccess: json['isSuccess'],
         addressSend: json["addressSend"],
-        addressReceive: json["addressSend"],
-        isEnter: json["isEnter"],
+        addressReceive: json["addressReceive"],
         costShip: json["costShip"],
         costProduct: json["costProduct"],
         phoneReceive: json['phoneReceive'],
-        shipedAt:
-            json['shipedAt'] != null ? DateTime.parse(json['shipedAt']) : null,
+        shipedAt: json['shipedAt'] != null
+            ? convertEpochToDateTime(json['shipedAt'])
+            : null,
         shippingAt: json['shippingAt'] != null
-            ? DateTime.parse(json['shippingAt'])
+            ? convertEpochToDateTime(json['shippingAt'])
             : null,
         phoneSend: json['phoneSend'],
-        statusShip: json["statusShip"],
-        createdAt: DateTime.parse(json["createdAt"]),
-        enterAt:
-            json['enterAt'] != null ? DateTime.parse(json['enterAt']) : null,
+        status: json["status"],
+        createdAt: convertEpochToDateTime(json['createAtTime']),
+        enterAt: json['enterAt'] != null
+            ? convertEpochToDateTime(json['enterAt'])
+            : null,
         note: json['note'],
         id: json["id"],
       );
