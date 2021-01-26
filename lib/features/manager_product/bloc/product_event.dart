@@ -6,8 +6,10 @@ abstract class ProductEvent {}
 class GetAllProduct extends ProductEvent {
   final bool isLoadMore;
   final bool isRefresh;
+  final int type;
 
-  GetAllProduct({this.isLoadMore = false, this.isRefresh = false});
+  GetAllProduct(
+      {this.isLoadMore = false, this.isRefresh = false, this.type = 0});
 }
 
 class GetInforProduct extends ProductEvent {
@@ -20,4 +22,10 @@ class GetInforCustomer extends ProductEvent {
   final Product product;
 
   GetInforCustomer(this.product);
+}
+
+class FindProduct extends ProductEvent {
+  final String keySearch;
+
+  FindProduct(this.keySearch);
 }

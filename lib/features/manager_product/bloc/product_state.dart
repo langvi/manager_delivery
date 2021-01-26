@@ -15,6 +15,12 @@ class GetAllProductSuccess extends ProductState {
 
 class Error extends ProductState {}
 
+class FindError extends ProductState {
+  final String message;
+
+  FindError(this.message);
+}
+
 class GetMoreProductSuccess extends ProductState {
   final List<Product> products;
 
@@ -32,4 +38,10 @@ class GetInforCustomerSuccess extends ProductState {
   final Product product;
 
   GetInforCustomerSuccess(this.customerProduct, this.product);
+}
+
+class FindSuccess extends ProductState {
+  final Product product;
+
+  FindSuccess(this.product);
 }

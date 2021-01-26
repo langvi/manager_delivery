@@ -47,7 +47,7 @@ class _MyAppState extends State<MyApp> {
         debugShowCheckedModeBanner: false,
         initialRoute: '/',
         onGenerateRoute: (setting) => _onGenerateRoute(setting),
-        home: StatisticPage(),
+        home: LoginPage(),
       ),
     );
   }

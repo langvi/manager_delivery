@@ -26,6 +26,8 @@ class EmployeeBloc extends BaseBloc<EmployeeEvent, EmployeeState> {
   ) async* {
     if (event is GetEmployees) {
       yield* _getEmployee(event);
+    } else if (event is FindShipper) {
+      yield* _findShipper(event);
     }
   }
 
@@ -38,6 +40,17 @@ class EmployeeBloc extends BaseBloc<EmployeeEvent, EmployeeState> {
       yield Loading();
     }
     var res = await _employeeRepo.getEmployees(pageIndex: pageIndex);
+    if (res.isSuccess) {
+      yield GetEmployeeSuccess(res.data.employees, res.data.totalShipper,
+          isLoadMore: event.isLoadMore);
+    } else {
+      yield Error('Lỗi');
+    }
+  }
+
+  Stream<EmployeeState> _findShipper(FindShipper event) async* {
+    yield Loading();
+    var res = await _employeeRepo.findShipper(event.keySearch);
     if (res.isSuccess) {
       yield GetEmployeeSuccess(res.data.employees, res.data.totalShipper);
     } else {

@@ -11,6 +11,7 @@ import 'package:manage_delivery/features/manager_employee/detail_employee/bloc/d
 import 'package:manage_delivery/features/manager_employee/model/employee_response.dart';
 import 'package:manage_delivery/features/manager_product/model/product_response.dart';
 import 'package:manage_delivery/utils/convert_value.dart';
+import 'package:manage_delivery/utils/dialog.dart';
 import 'package:manage_delivery/utils/status_product.dart';
 
 class DetailEmployeePage extends StatefulWidget {
@@ -31,18 +32,29 @@ class _DetailEmployeePageState
   bool isChangePhone = false;
   bool isShowList = false;
   bool isShowGetProduct = true;
-  String currentTime = '22/2/2021';
+
+  DateTime currentTime;
+  // String currentTime = '22/2/2021';
   List<Product> products = [];
   @override
   void initBloc() {
     bloc = DetailEmployeeBloc();
+    currentTime = DateTime.now();
   }
 
   @override
   void didChangeDependencies() {
-    employee = ModalRoute.of(context).settings.arguments;
-    _nameController.text = employee.name;
-    _phoneController.text = employee.phoneNumber;
+    if (employee == null) {
+      employee = ModalRoute.of(context).settings.arguments;
+      DateTime currentTime = DateTime.now();
+      bloc.add(GetProductOfEmployee(
+          employee.id,
+          DateTime(currentTime.year, currentTime.month, currentTime.day),
+          DateTime(currentTime.year, currentTime.month, currentTime.day + 1)));
+      _nameController.text = employee.name;
+      _phoneController.text = employee.phoneNumber;
+    }
+
     super.didChangeDependencies();
   }
 
@@ -51,7 +63,21 @@ class _DetailEmployeePageState
     return BlocProvider<DetailEmployeeBloc>(
       create: (context) => bloc,
       child: BlocConsumer<DetailEmployeeBloc, DetailEmployeeState>(
-        listener: (context, state) {},
+        listener: (context, state) {
+          if (state is Loading) {
+            isShowLoading = true;
+          } else if (state is UpdateSuccess) {
+            isShowLoading = false;
+            isChangeName = false;
+          } else if (state is GetProductSuccess) {
+            isShowLoading = false;
+            products = state.products;
+          } else if (state is Error) {
+            isShowLoading = false;
+            ShowDialog(context)
+                .showNotification('Có lỗi xảy ra \n Xin vui lòng thử lại sau');
+          }
+        },
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(
@@ -75,9 +101,8 @@ class _DetailEmployeePageState
         children: [
           _buildAvatar(),
           _buildInfor(),
-          Visibility(
-            visible: isShowList,
-            child: _buildListProduct(),
+          const SizedBox(
+            height: 10,
           ),
           Visibility(visible: isShowList, child: _buildListProduct())
         ],
@@ -149,7 +174,7 @@ class _DetailEmployeePageState
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildItemInfor('Khu vực giao', employee.shipArea),
-                _buildItemInfor('Số ngày công', '22'),
+                _buildItemInfor('Số ngày công', employee.dayWork.toString()),
               ],
             ),
           ),
@@ -157,32 +182,10 @@ class _DetailEmployeePageState
         SizedBox(
           height: 10,
         ),
-        // Padding(
-        //   padding: const EdgeInsets.all(10.0),
-        //   child: Text(
-        //     'Công việc',
-        //     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        //   ),
-        // ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: _buildItemJob(AppColors.gradientGetProduct),
-          // child: Row(
-          //   children: [
-          //     Expanded(
-          //         child:
-          //             _buildItemJob(AppColors.gradientGetProduct, 'Lấy hàng')),
-          //     SizedBox(
-          //       width: 10,
-          //     ),
-          //     Expanded(
-          //         child: _buildItemJob(AppColors.gradientShipped, 'Giao hàng')),
-          //   ],
-          // ),
         )
-        // Divider(
-        //   thickness: 1,
-        // ),
       ],
     );
   }
@@ -203,17 +206,44 @@ class _DetailEmployeePageState
                   width: 30,
                 ),
                 Text(
-                  'Số đơn giao: 21',
+                  'Số đơn giao: ${products.length}',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 Spacer(),
-                Text('20/12/2021'),
+                Text(convertDateTimeToDay(currentTime)),
                 IconButton(
                     icon: Icon(
                       FontAwesome.calendar,
                       color: Colors.black,
                     ),
-                    onPressed: null)
+                    onPressed: () {
+                      DatePicker.showDatePicker(context,
+                          showTitleActions: true,
+                          minTime: DateTime(1900, 1, 1),
+                          maxTime: DateTime(2030, 12, 31),
+                          theme: DatePickerTheme(
+                              headerColor: AppColors.mainColor,
+                              backgroundColor: Colors.white,
+                              cancelStyle: TextStyle(
+                                  color: Color(0xfff6fadc), fontSize: 16),
+                              itemStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18),
+                              doneStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
+                          onConfirm: (date) {
+                        bloc.add(GetProductOfEmployee(
+                            employee.id,
+                            DateTime(date.year, date.month, date.day),
+                            DateTime(date.year, date.month, date.day + 1)));
+                        setState(() {
+                          currentTime = date;
+                        });
+                      }, currentTime: currentTime, locale: LocaleType.vi);
+                    })
               ],
             ),
             SizedBox(
@@ -222,10 +252,11 @@ class _DetailEmployeePageState
             Row(
               children: [
                 Expanded(
-                  child: _buildText('Thành công', '20', AppColors.mainColor),
+                  child: _buildText(
+                      'Thành công', getSuccess(), AppColors.mainColor),
                 ),
                 Expanded(
-                  child: _buildText('Thất bại', '1', Colors.red),
+                  child: _buildText('Thất bại', getFailure(), Colors.red),
                 )
               ],
             ),
@@ -255,15 +286,6 @@ class _DetailEmployeePageState
                   ],
                 ),
               ),
-              // child: Chip(
-              //   backgroundColor: Colors.black54,
-              //   label: Text(
-              //     'Chi tiết',
-              //     style: TextStyle(
-              //         color: Colors.white,
-              //         decoration: TextDecoration.underline),
-              //   ),
-              // ),
             )
           ],
         ),
@@ -320,8 +342,13 @@ class _DetailEmployeePageState
               focusNode: _nameFocus,
               readOnly: !isChangeName,
               onFieldSubmitted: (value) {
-                isChangeName = false;
-                print(value);
+                if (value.isNotEmpty) {
+                  employee.name = value;
+                  bloc.add(UpdateShipper(employee));
+                } else {
+                  ShowDialog(context)
+                      .showNotification('Tên không được để trống');
+                }
               },
               textInputAction: TextInputAction.done,
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -355,10 +382,17 @@ class _DetailEmployeePageState
           child: TextFormField(
               controller: _phoneController,
               focusNode: _phoneFocus,
+              keyboardType: TextInputType.phone,
               readOnly: !isChangePhone,
               onFieldSubmitted: (value) {
+                if (value.isNotEmpty) {
+                  employee.phoneNumber = value;
+                  bloc.add(UpdateShipper(employee));
+                } else {
+                  ShowDialog(context)
+                      .showNotification('Số điện thoại không được để trống');
+                }
                 isChangePhone = false;
-                print(value);
               },
               textInputAction: TextInputAction.done,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -383,7 +417,9 @@ class _DetailEmployeePageState
 
   Widget _buildListProduct() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+      ),
       child: ListView.builder(
         itemCount: products.length,
         shrinkWrap: true,
@@ -508,5 +544,25 @@ class _DetailEmployeePageState
         ),
       ),
     );
+  }
+
+  String getSuccess() {
+    int success = 0;
+    products.forEach((element) {
+      if (element.status == 2 || element.status == 6) {
+        success++;
+      }
+    });
+    return success.toString();
+  }
+
+  String getFailure() {
+    int failure = 0;
+    products.forEach((element) {
+      if (element.status == 3 || element.status == 5) {
+        failure++;
+      }
+    });
+    return failure.toString();
   }
 }

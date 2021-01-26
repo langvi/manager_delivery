@@ -51,6 +51,7 @@ class _StatisticPageState
           return baseShowLoading(
             child: Scaffold(
               appBar: AppBar(
+                automaticallyImplyLeading: false,
                 backgroundColor: AppColors.mainColor,
                 elevation: 0,
                 title: Text('Thống kê'),
@@ -150,34 +151,38 @@ class _StatisticPageState
                               sections: showingSections()),
                         )
                       : Container(
+                          height: 200,
                           child: Center(child: Text('Không có dữ liệu')),
                         ),
                   SizedBox(
                     height: 10,
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Indicator(
-                        color: Colors.blue,
-                        text: 'Đã giao',
-                        isSquare: false,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: Indicator(
-                          color: Colors.green,
-                          text: 'Đang giao',
+                  Visibility(
+                    visible: hasData(),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Indicator(
+                          color: Colors.blue,
+                          text: 'Đã giao',
                           isSquare: false,
                         ),
-                      ),
-                      Indicator(
-                        color: Colors.orange,
-                        text: 'Đang lấy',
-                        isSquare: false,
-                      ),
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Indicator(
+                            color: Colors.green,
+                            text: 'Đang giao',
+                            isSquare: false,
+                          ),
+                        ),
+                        Indicator(
+                          color: Colors.orange,
+                          text: 'Đang lấy',
+                          isSquare: false,
+                        ),
+                      ],
+                    ),
                   )
                 ],
               ),
@@ -197,7 +202,9 @@ class _StatisticPageState
           return PieChartSectionData(
             color: Colors.green,
             value: dataChart.percentShipping,
-            title: '${getValue(dataChart.percentShipping)}%',
+            title: dataChart.percentShipping == 0
+                ? ''
+                : '${getValue(dataChart.percentShipping)}%',
             radius: radius,
             titleStyle: TextStyle(
                 fontSize: fontSize,
@@ -221,7 +228,9 @@ class _StatisticPageState
           return PieChartSectionData(
             color: Colors.orange,
             value: dataChart.percentGetting,
-            title: '${getValue(dataChart.percentGetting)}%',
+            title: dataChart.percentGetting == 0
+                ? ''
+                : '${getValue(dataChart.percentGetting)}%',
             radius: radius,
             titleStyle: TextStyle(
                 fontSize: fontSize,
@@ -300,5 +309,6 @@ class _StatisticPageState
 
   String getValue(double value) {
     return value.toStringAsFixed(2);
+    // return '';
   }
 }

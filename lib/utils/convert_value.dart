@@ -30,6 +30,15 @@ DateTime convertStringtoDateTime(String value) {
   return DateTime.parse(value);
 }
 
+String convertToId(int id) {
+  String productId = '';
+  int length = id.toString().length;
+  for (int i = length; i < 7; i++) {
+    productId += '0';
+  }
+  return productId + id.toString();
+}
+
 List<String> getDateFromDropDown(String date) {
   List<String> listDate = [];
   if (date == 'Hôm nay') {

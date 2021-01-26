@@ -62,7 +62,11 @@ abstract class BaseStatefulWidgetState<SF extends StatefulWidget,
             visible: isShowLoading,
             child: Container(
                 color: Colors.black38,
-                child: Center(child: CircularProgressIndicator())))
+                child: Center(
+                    child: CircularProgressIndicator(
+                        backgroundColor: Colors.black38,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.white)))))
       ],
     );
   }

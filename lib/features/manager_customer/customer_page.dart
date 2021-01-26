@@ -4,9 +4,12 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/consts/const.dart';
 import 'package:manage_delivery/base/view/base_staful_widget.dart';
+import 'package:manage_delivery/base/view/base_widget.dart';
 import 'package:manage_delivery/features/manager_customer/bloc/customer_bloc.dart';
 import 'package:manage_delivery/features/manager_customer/model/customer_response.dart';
 import 'package:manage_delivery/utils/dialog.dart';
+import 'package:manage_delivery/utils/search.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CustomerPage extends StatefulWidget {
@@ -20,11 +23,13 @@ class _CustomerPageState
     extends BaseStatefulWidgetState<CustomerPage, CustomerBloc> {
   TextEditingController searchController = TextEditingController();
   ScrollController controller = ScrollController();
+  ScrollController scrollCustomer = ScrollController();
+  final _refreshController = RefreshController();
   bool isShowInfor = true;
   String currentValue = '';
   int totalCustomer = 0;
   List<Customer> customers = [];
-  List<String> values = ['Tất cả', 'Đống Đa'];
+  List<String> values = ['Tất cả', 'Đống Đa', 'Thanh Xuân'];
   @override
   void initBloc() {
     bloc = CustomerBloc();
@@ -52,9 +57,17 @@ class _CustomerPageState
             isShowLoading = true;
           } else if (state is GetCustomerSuccess) {
             isShowLoading = false;
-            customers = state.customers;
+            if (state.isLoadMore) {
+              customers.addAll(state.customers);
+              _refreshController.loadComplete();
+            } else {
+              customers = state.customers;
+              _refreshController.refreshCompleted();
+            }
             totalCustomer = state.totalCustomer;
           } else if (state is Error) {
+            _refreshController.loadComplete();
+            _refreshController.refreshCompleted();
             isShowLoading = false;
             ShowDialog(context).showNotification(state.message);
           }
@@ -93,7 +106,14 @@ class _CustomerPageState
                                         color: Colors.white,
                                         size: 20,
                                       ),
-                                      onPressed: () {}),
+                                      onPressed: () {
+                                        showSearch(
+                                            context: context,
+                                            delegate: CustomSearchDelegate(
+                                                callbackFind: (value) {
+                                              bloc.add(FindCustomer(value));
+                                            }));
+                                      }),
                                 ],
                               ),
                               Visibility(
@@ -203,35 +223,33 @@ class _CustomerPageState
   Widget _buildBody() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 5,
-          ),
-          Expanded(
-            child: ListView.builder(
-                itemCount: customers.length,
-                itemBuilder: (context, index) {
-                  return _buildItemCustomer(index);
-                }),
-          ),
-        ],
+      child: SmartRefresher(
+        controller: _refreshController,
+        scrollController: scrollCustomer,
+        enablePullDown: true,
+        footer: BaseWidget.buildFooter(),
+        enablePullUp: true,
+        onRefresh: () {
+          bloc.add(GetAllCustomer(isRefresh: true));
+        },
+        onLoading: () {
+          bloc.add(GetAllCustomer(isLoadMore: true));
+        },
+        child: Column(
+          children: [
+            SizedBox(
+              height: 5,
+            ),
+            Expanded(
+              child: ListView.builder(
+                  itemCount: customers.length,
+                  itemBuilder: (context, index) {
+                    return _buildItemCustomer(index);
+                  }),
+            ),
+          ],
+        ),
       ),
-    );
-  }
-
-  Widget _buildSearchInput() {
-    return Row(
-      children: [
-        Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Text(
-              'Danh sách khách hàng'.toUpperCase(),
-              style: TextStyle(color: AppColors.mainColor, fontSize: 18),
-            )),
-        Spacer(),
-        IconButton(icon: Icon(Icons.search), onPressed: () {})
-      ],
     );
   }
 
@@ -257,15 +275,28 @@ class _CustomerPageState
                 //     gradient:
                 //         LinearGradient(colors: [Colors.red, Colors.orange]),
                 //     shape: BoxShape.circle),
-                child: CircleAvatar(
-                  child: customers[index].avatarUrl.isNotEmpty
-                      ? Image.network(
-                          customers[index].avatarUrl,
-                          fit: BoxFit.cover,
-                        )
-                      : Icon(
-                          Icons.person,
-                        ),
+                child: SizedBox(
+                  height: 50,
+                  width: 50,
+                  child: CircleAvatar(
+                      backgroundColor: Colors.orange[300],
+                      child: customers[index].avatarUrl.isNotEmpty
+                          ? Image.network(
+                              customers[index].avatarUrl,
+                              fit: BoxFit.cover,
+                            )
+                          : Center(
+                              child: Text(
+                              getAvatarName(customers[index].name),
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ))
+                      // : Icon(
+                      //     Icons.person,
+                      //   ),
+                      ),
                 ),
               ),
               SizedBox(
@@ -365,5 +396,9 @@ class _CustomerPageState
           );
           return list;
         });
+  }
+
+  String getAvatarName(String name) {
+    return name[0];
   }
 }

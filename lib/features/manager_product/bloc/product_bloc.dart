@@ -31,6 +31,8 @@ class ProductBloc extends BaseBloc<ProductEvent, ProductState> {
       yield* _getInforProduct(event);
     } else if (event is GetInforCustomer) {
       yield* _getInforCusOfProduct(event);
+    } else if (event is FindProduct) {
+      yield* _findProduct(event);
     }
   }
 
@@ -42,7 +44,8 @@ class ProductBloc extends BaseBloc<ProductEvent, ProductState> {
     } else {
       yield Loading();
     }
-    var response = await _productRepository.getAllProduct(pageIndex: pageIndex);
+    var response = await _productRepository.getProducts(
+        pageIndex: pageIndex, type: event.type);
     if (response.isSuccess) {
       yield event.isLoadMore
           ? GetMoreProductSuccess(response.data)
@@ -61,6 +64,16 @@ class ProductBloc extends BaseBloc<ProductEvent, ProductState> {
       yield GetInforSuccess(response.infor);
     } else {
       yield Error();
+    }
+  }
+
+  Stream<ProductState> _findProduct(FindProduct event) async* {
+    yield Loading();
+    var res = await _productRepository.findProduct(event.keySearch);
+    if (res.isSuccess) {
+      yield FindSuccess(res.data);
+    } else {
+      yield FindError(res.message);
     }
   }
 

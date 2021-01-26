@@ -9,3 +9,9 @@ class GetEmployees extends EmployeeEvent {
 
   GetEmployees({this.isLoadMore = false, this.isRefresh = false});
 }
+
+class FindShipper extends EmployeeEvent {
+  final String keySearch;
+
+  FindShipper(this.keySearch);
+}

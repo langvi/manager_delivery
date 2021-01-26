@@ -25,13 +25,32 @@ class CustomerBloc extends BaseBloc<CustomerEvent, CustomerState> {
     CustomerEvent event,
   ) async* {
     if (event is GetAllCustomer) {
-      yield* _getCustomer();
+      yield* _getCustomer(event);
+    } else if (event is FindCustomer) {
+      yield* _findCustomer(event);
     }
   }
 
-  Stream<CustomerState> _getCustomer() async* {
+  Stream<CustomerState> _getCustomer(GetAllCustomer event) async* {
+    if (event.isLoadMore) {
+      pageIndex++;
+    } else if (event.isRefresh) {
+      pageIndex = 0;
+    } else {
+      yield Loading();
+    }
+    var res = await _customerRepo.getCustomers(pageIndex);
+    if (res.isSuccess) {
+      yield GetCustomerSuccess(res.data.customer, res.data.totalCustomer,
+          isLoadMore: event.isLoadMore);
+    } else {
+      yield Error('Lỗi');
+    }
+  }
+
+  Stream<CustomerState> _findCustomer(FindCustomer event) async* {
     yield Loading();
-    var res = await _customerRepo.getCustomers();
+    var res = await _customerRepo.findCustomer(event.keySearch);
     if (res.isSuccess) {
       yield GetCustomerSuccess(res.data.customer, res.data.totalCustomer);
     } else {

@@ -25,7 +25,6 @@ class LoginBloc extends BaseBloc<LoginEvent, LoginState> {
   Stream<LoginState> _login(Login event) async* {
     yield Loading();
     var response = await _loginRepository.login(event.name, event.password);
-
     if (response.isSuccess) {
       prefs.setString(AppConst.keyToken, response.data);
       yield LoginSuccess();

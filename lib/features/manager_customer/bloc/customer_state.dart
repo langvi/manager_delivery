@@ -16,6 +16,14 @@ class Error extends CustomerState {
 class GetCustomerSuccess extends CustomerState {
   final List<Customer> customers;
   final int totalCustomer;
+  final bool isLoadMore;
 
-  GetCustomerSuccess(this.customers, this.totalCustomer);
+  GetCustomerSuccess(this.customers, this.totalCustomer,
+      {this.isLoadMore = false});
+}
+
+class FindSuccess extends CustomerState {
+  final List<Customer> customers;
+
+  FindSuccess(this.customers);
 }

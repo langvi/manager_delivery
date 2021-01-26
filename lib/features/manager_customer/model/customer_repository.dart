@@ -5,9 +5,17 @@ import 'package:manage_delivery/features/manager_customer/model/product_res.dart
 
 class CustomerRepository {
   final _baseRequest = BaseRequest();
-  Future<CustomerResponse> getCustomers() async {
+  Future<CustomerResponse> getCustomers(int pageIndex) async {
     var res = await _baseRequest.sendRequest(
-        AppConst.getCustomerUrl, RequestMethod.GET);
+        AppConst.getCustomerUrl, RequestMethod.GET,
+        queryParams: {'pageIndex': pageIndex});
+    return CustomerResponse.fromJson(res);
+  }
+
+  Future<CustomerResponse> findCustomer(String name) async {
+    var res = await _baseRequest.sendRequest(
+        AppConst.findCustomerUrl, RequestMethod.GET,
+        queryParams: {'keySearch': name});
     return CustomerResponse.fromJson(res);
   }
 

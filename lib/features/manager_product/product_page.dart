@@ -9,8 +9,10 @@ import 'package:manage_delivery/features/manager_product/bloc/product_bloc.dart'
 import 'package:manage_delivery/features/manager_product/model/infor_response.dart';
 import 'package:manage_delivery/features/manager_product/model/product_response.dart';
 import 'package:manage_delivery/utils/convert_value.dart';
+import 'package:manage_delivery/utils/dialog.dart';
 import 'package:manage_delivery/utils/dropdown_widget.dart';
 import 'package:manage_delivery/utils/input_text.dart';
+import 'package:manage_delivery/utils/search.dart';
 import 'package:manage_delivery/utils/status_product.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -31,7 +33,8 @@ class _ProductPageState
   final _refreshController = RefreshController();
   final _scrollController = ScrollController();
   String currentValue = 'Tất cả';
-  List<String> values = ['Tất cả', 'Đống Đa'];
+  int currentType = 0;
+  // List<String> values = ['Tất cả', 'Đống Đa'];
   InforProduct inforProduct;
   @override
   void initBloc() {
@@ -66,7 +69,16 @@ class _ProductPageState
                   'product': state.product,
                   'inforCus': state.customerProduct
                 });
-          } else if (state is Error) {}
+          } else if (state is FindSuccess) {
+            isShowLoading = false;
+            products.clear();
+            products.add(state.product);
+          } else if (state is FindError) {
+            isShowLoading = false;
+            ShowDialog(context).showNotification(state.message);
+          } else if (state is Error) {
+            isShowLoading = false;
+          }
         },
         builder: (context, state) {
           return baseShowLoading(
@@ -86,7 +98,14 @@ class _ProductPageState
                         Icons.search,
                         color: Colors.white,
                       ),
-                      onPressed: () {}),
+                      onPressed: () {
+                        showSearch(
+                            context: context,
+                            delegate:
+                                CustomSearchDelegate(callbackFind: (keySearch) {
+                              bloc.add(FindProduct(keySearch));
+                            }));
+                      }),
                   _popUpMenu()
                 ],
               ),
@@ -118,6 +137,21 @@ class _ProductPageState
                     fontSize: 18,
                     fontWeight: FontWeight.bold),
               ),
+              Spacer(),
+              Expanded(
+                flex: 2,
+                child: buildDropDown(
+                    values: ['Tất cả', 'Lấy hàng', 'Đang giao', 'Đã giao'],
+                    hintText: 'Trạng thái',
+                    currentValue: currentValue,
+                    onChange: (value) {
+                      setState(() {
+                        getTypeOfProduct(value);
+                        currentValue = value;
+                        bloc.add(GetAllProduct(type: currentType));
+                      });
+                    }),
+              )
             ],
           ),
         ),
@@ -194,64 +228,6 @@ class _ProductPageState
     );
   }
 
-  Widget _buildGeneral() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _buildItemCard('Tạo đơn hàng', Icons.add, onClick: () {
-          Navigator.pushNamed(context, AppConst.routeCreateProduct);
-        }),
-        _buildItemCard('Đang giao', Icons.send, onClick: () {}),
-        _buildItemCard('Đã giao', Icons.home, onClick: () {}),
-      ],
-    );
-  }
-
-  Widget _buildItemCard(String title, IconData icon, {Function onClick}) {
-    return GestureDetector(
-      onTap: onClick,
-      child: Card(
-        color: AppColors.mainColor,
-        child: Container(
-          width: 100,
-          height: 120,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                title,
-                style: TextStyle(color: Colors.white),
-              ),
-              Icon(
-                icon,
-                color: Colors.white,
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSearchInput() {
-    return Row(
-      children: [
-        Expanded(
-          child: BuildTextInput(
-            hintText: 'Tìm kiếm',
-            controller: searchController,
-            filledColor: Colors.grey[300],
-            iconLeading: Icons.search,
-            iconNextTextInputAction: TextInputAction.search,
-            submitFunc: () {},
-          ),
-        ),
-        IconButton(
-            icon: Icon(MaterialCommunityIcons.filter_variant), onPressed: () {})
-      ],
-    );
-  }
-
   Widget _buildListProduct() {
     return SmartRefresher(
       footer: BaseWidget.buildFooter(),
@@ -260,10 +236,10 @@ class _ProductPageState
       enablePullDown: true,
       enablePullUp: true,
       onLoading: () {
-        bloc.add(GetAllProduct(isLoadMore: true));
+        bloc.add(GetAllProduct(isLoadMore: true, type: currentType));
       },
       onRefresh: () {
-        bloc.add(GetAllProduct(isRefresh: true));
+        bloc.add(GetAllProduct(isRefresh: true, type: currentType));
         bloc.add(GetInforProduct(isRefresh: true));
       },
       child: Padding(
@@ -451,5 +427,24 @@ class _ProductPageState
       );
       return list;
     });
+  }
+
+  void getTypeOfProduct(String type) {
+    switch (type) {
+      case 'Tất cả':
+        currentType = 0;
+
+        break;
+      case 'Lấy hàng':
+        currentType = 1;
+        break;
+      case 'Đang giao':
+        currentType = 2;
+        break;
+      case 'Đã giao':
+        currentType = 3;
+        break;
+      default:
+    }
   }
 }

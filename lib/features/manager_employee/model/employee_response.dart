@@ -50,6 +50,7 @@ class Employee {
     this.phoneNumber,
     this.avatarUrl,
     this.shipArea,
+    this.dayWork,
     this.id,
   });
 
@@ -57,6 +58,7 @@ class Employee {
   String phoneNumber;
   String shipArea;
   String avatarUrl;
+  int dayWork;
   String id;
 
   factory Employee.fromJson(Map<String, dynamic> json) => Employee(
@@ -64,6 +66,7 @@ class Employee {
         phoneNumber: json["phoneNumber"],
         avatarUrl: json["avatarUrl"],
         shipArea: json["shipArea"],
+        dayWork: json["dayWork"],
         id: json["id"],
       );
 
@@ -71,6 +74,5 @@ class Employee {
         "name": name,
         "phoneNumber": phoneNumber,
         "avatarUrl": avatarUrl,
-        "id": id,
       };
 }

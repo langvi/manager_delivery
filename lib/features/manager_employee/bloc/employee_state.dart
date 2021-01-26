@@ -10,8 +10,9 @@ class Loading extends EmployeeState {}
 class GetEmployeeSuccess extends EmployeeState {
   final List<Employee> employees;
   final int totalShipper;
+  final bool isLoadMore;
 
-  GetEmployeeSuccess(this.employees, this.totalShipper);
+  GetEmployeeSuccess(this.employees, this.totalShipper,{this.isLoadMore = false});
 }
 
 class Error extends EmployeeState {

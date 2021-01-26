@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -74,6 +75,18 @@ class _EnterProductPageState
               child: BuildTextInput(
                   filledColor: Colors.grey[300],
                   hintText: 'Nhập mã đơn hàng',
+                  textInputType: TextInputType.number,
+                  iconNextTextInputAction: TextInputAction.done,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(7)
+                  ],
+                  submitFunc: () {
+                    if (_controller.text.isNotEmpty) {
+                      productId = _controller.text;
+                      bloc.add(EnterProduct(productId));
+                    }
+                  },
                   controller: _controller)),
           IconButton(
               icon: Icon(AntDesign.qrcode),

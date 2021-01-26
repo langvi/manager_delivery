@@ -38,10 +38,18 @@ class _EmployeePageState
             isShowLoading = true;
           } else if (state is GetEmployeeSuccess) {
             isShowLoading = false;
-            employees.addAll(state.employees);
+            if (state.isLoadMore) {
+              _refreshController.loadComplete();
+              employees.addAll(state.employees);
+            } else {
+              _refreshController.refreshCompleted();
+              employees = state.employees;
+            }
             totalShipper = state.totalShipper;
           } else if (state is Error) {
             isShowLoading = false;
+            _refreshController.loadComplete();
+            _refreshController.refreshCompleted();
             ShowDialog(context).showNotification(state.message);
           }
         },

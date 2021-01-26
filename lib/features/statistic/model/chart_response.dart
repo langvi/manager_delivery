@@ -18,9 +18,9 @@ class ChartResponse {
 
 class DataChart {
   DataChart({
-    this.percentGetting,
-    this.percentShipping,
-    this.percentShiped,
+    this.percentGetting = 0,
+    this.percentShipping = 0,
+    this.percentShiped = 0,
   });
 
   double percentGetting;
@@ -32,7 +32,9 @@ class DataChart {
     int shipping = json['countShipping'];
     int shiped = json['countShiped'];
     int total = getting + shipping + shiped;
-
+    if (total == 0) {
+      return DataChart();
+    }
     return DataChart(
         percentGetting: getting / total * 100,
         percentShipping: shipping / total * 100,

@@ -61,30 +61,32 @@ class Product {
   DateTime createdAt;
   String id;
 
-  factory Product.fromJson(Map<String, dynamic> json) => Product(
-        nameProduct: json["nameProduct"],
-        sendFrom: json["sendFrom"],
-        receiveBy: json["receiveBy"],
-        addressSend: json["addressSend"],
-        addressReceive: json["addressReceive"],
-        costShip: json["costShip"],
-        costProduct: json["costProduct"],
-        phoneReceive: json['phoneReceive'],
-        shipedAt: json['shipedAt'] != null
-            ? convertEpochToDateTime(json['shipedAt'])
-            : null,
-        shippingAt: json['shippingAt'] != null
-            ? convertEpochToDateTime(json['shippingAt'])
-            : null,
-        phoneSend: json['phoneSend'],
-        status: json["status"],
-        createdAt: convertEpochToDateTime(json['createAtTime']),
-        enterAt: json['enterAt'] != null
-            ? convertEpochToDateTime(json['enterAt'])
-            : null,
-        note: json['note'],
-        id: json["id"],
-      );
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      nameProduct: json["nameProduct"],
+      sendFrom: json["sendFrom"],
+      receiveBy: json["receiveBy"],
+      addressSend: json["addressSend"],
+      addressReceive: json["addressReceive"],
+      costShip: json["costShip"],
+      costProduct: json["costProduct"],
+      phoneReceive: json['phoneReceive'],
+      shipedAt: json['shipedAt'] != null
+          ? convertEpochToDateTime(json['shipedAt'])
+          : null,
+      shippingAt: json['shippingAt'] != null
+          ? convertEpochToDateTime(json['shippingAt'])
+          : null,
+      phoneSend: json['phoneSend'],
+      status: json["status"],
+      createdAt: convertEpochToDateTime(json['createAtTime']),
+      enterAt: json['enterAt'] != null
+          ? convertEpochToDateTime(json['enterAt'])
+          : null,
+      note: json['note'],
+      id: convertToId(json['productId']),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "nameProduct": nameProduct,
