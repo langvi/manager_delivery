@@ -15,3 +15,9 @@ class FindCustomer extends CustomerEvent {
 
   FindCustomer(this.keySearch);
 }
+
+class GetCustomerArea extends CustomerEvent {
+  final int areaId;
+  
+  GetCustomerArea(this.areaId);
+}

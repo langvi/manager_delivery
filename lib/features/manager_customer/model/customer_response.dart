@@ -1,3 +1,5 @@
+import 'package:manage_delivery/features/manager_product/model/product_response.dart';
+
 class CustomerResponse {
   CustomerResponse({
     this.message,
@@ -74,4 +76,17 @@ class Customer {
         "avatarUrl": avatarUrl,
         "id": id,
       };
+}
+
+class FindResponse {
+  String message;
+  bool isSuccess;
+  Product product;
+  FindResponse({this.isSuccess, this.message, this.product});
+  factory FindResponse.fromJson(Map<String, dynamic> json) => FindResponse(
+        message: json["message"],
+        isSuccess: json["isSuccess"],
+        product:
+            json["data"] == null ? Product() : Product.fromJson(json["data"]),
+      );
 }

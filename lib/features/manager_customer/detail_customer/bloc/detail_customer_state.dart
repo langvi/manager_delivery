@@ -7,7 +7,11 @@ class DetailCustomerInitial extends DetailCustomerState {}
 
 class Loading extends DetailCustomerState {}
 
-class Error extends DetailCustomerState {}
+class Error extends DetailCustomerState {
+  final String message;
+
+  Error({this.message = 'Lỗi'});
+}
 
 class GetProductSuccess extends DetailCustomerState {
   final List<Product> products;
@@ -22,4 +26,10 @@ class GetProductSuccess extends DetailCustomerState {
       this.totalGetting,
       this.totalShipping,
       this.totalShiped});
+}
+
+class FindSuccess extends DetailCustomerState {
+  final Product product;
+
+  FindSuccess(this.product);
 }

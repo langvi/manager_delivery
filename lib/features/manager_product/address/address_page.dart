@@ -4,8 +4,10 @@ import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/view/base_staful_widget.dart';
 import 'package:manage_delivery/features/manager_product/address/bloc/address_bloc.dart';
 import 'package:manage_delivery/features/manager_product/model/product_response.dart';
+import 'package:manage_delivery/utils/address.dart';
 import 'package:manage_delivery/utils/dialog.dart';
 import 'package:manage_delivery/utils/input_text.dart';
+import 'package:manage_delivery/utils/key_board.dart';
 import 'package:manage_delivery/utils/style_text.dart';
 import 'package:manage_delivery/utils/validator.dart';
 
@@ -18,7 +20,7 @@ class AddressPage extends StatefulWidget {
 
 class _AddressPageState
     extends BaseStatefulWidgetState<AddressPage, AddressBloc> {
-  TextEditingController nameReceiveController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController detailAddressCtr = TextEditingController();
   final _nameFocus = FocusNode();
@@ -28,6 +30,15 @@ class _AddressPageState
   String currentProvince;
   String currentDistrict;
   String currentVillage;
+  // List<Address> address = [];
+  List<String> districs = [
+    'Đống Đa',
+    'Thanh Xuân',
+    'Nam Từ Liêm',
+    'Cầu Giấy',
+    'Hai Bà Trưng',
+    'Hoàng Mai',
+  ];
   bool isSend = true;
   // List<String> provinces = ['Hà Nội', 'Lạng Sơn', 'Bắc Ninh', 'Thái Nguyên'];
   List<Product> products = [];
@@ -54,7 +65,12 @@ class _AddressPageState
             isShowLoading = true;
           } else if (state is CreateProductSuccess) {
             isShowLoading = false;
-            ShowDialog(context).showNotification('Tạo đơn hàng thành công');
+            hideKeyboard(context);
+            ShowDialog(context).showNotification('Tạo đơn hàng thành công',
+                functionCloseDialog: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            });
           } else if (state is Error) {
             isShowLoading = false;
           }
@@ -103,13 +119,13 @@ class _AddressPageState
               padding: const EdgeInsets.symmetric(vertical: 5),
               child: BuildTextInput(
                 hintText: getTitle(enterName),
-                controller: nameReceiveController,
+                controller: nameController,
                 currentNode: _nameFocus,
                 nextNode: _phoneFocus,
                 isBorder: true,
                 validator: (value) {
                   if (value.isEmpty) {
-                    return 'Tên người gửi không được để trống';
+                    return 'Tên người ${isSend ? 'gửi' : 'nhận'} không được để trống';
                   }
                   return null;
                 },
@@ -143,13 +159,13 @@ class _AddressPageState
                   width: 10,
                 ),
                 Expanded(
-                    child: _buildDropDown(
-                        'Chọn quận(huyện)', ['Hai Bà Trưng'], 1)),
+                    child: _buildDropDown('Chọn quận(huyện)', districs, 1)),
               ],
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
-              child: _buildDropDown('Chọn phường(xã)', ['Bách Khoa'], 2),
+              child: _buildDropDown('Chọn phường(xã)',
+                  Address.fromJson(currentDistrict).villages, 2),
             ),
             TextFormField(
               controller: detailAddressCtr,
@@ -194,6 +210,7 @@ class _AddressPageState
                 break;
               case 1:
                 currentDistrict = newValue;
+                currentVillage = null;
                 break;
               case 2:
                 currentVillage = newValue;
@@ -230,13 +247,16 @@ class _AddressPageState
                   products.forEach((element) {
                     element.addressSend = getAddress();
                     element.phoneSend = phoneController.text;
-                    element.sendFrom = nameReceiveController.text;
+                    element.sendFrom = nameController.text;
                   });
+                  nameController.text = '';
+                  phoneController.text = '';
+                  detailAddressCtr.text = '';
                 } else {
                   products.forEach((element) {
                     element.addressReceive = getAddress();
                     element.phoneReceive = phoneController.text;
-                    element.receiveBy = nameReceiveController.text;
+                    element.receiveBy = nameController.text;
                     bloc.add(CreateProduct(element));
                   });
                 }
@@ -263,11 +283,11 @@ class _AddressPageState
 
   String getAddress() {
     return detailAddressCtr.text +
-        ',' +
+        ', ' +
         currentVillage +
-        ',' +
+        ', ' +
         currentDistrict +
-        ',' +
+        ', ' +
         currentProvince;
   }
 

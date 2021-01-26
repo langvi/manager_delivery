@@ -23,6 +23,8 @@ class AppConst {
   static const String findCustomerUrl = '/findByName';
   static const String getProductOfCustomerUrl = '/getProductCustomer';
   static const String getProductCustomerUrl = '/getInforCustomer';
+  static const String getCustomerByAreaUrl = '/getCustomerByArea';
+  static const String findOneProductUrl = '/findOneProduct';
   static const String getEmployeeUrl = '/getAllEmployee';
   static const String updateEmployeeUrl = '/updateEmployee';
   static const String getProductByEmployeeUrl = '/productByTime';

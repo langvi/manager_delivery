@@ -8,3 +8,10 @@ class GetProductByCustomer extends DetailCustomerEvent {
 
   GetProductByCustomer(this.customerId);
 }
+
+class FindProduct extends DetailCustomerEvent {
+  final int productId;
+  final String customerId;
+
+  FindProduct(this.productId, this.customerId);
+}

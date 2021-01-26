@@ -7,6 +7,7 @@ import 'package:manage_delivery/base/view/base_widget.dart';
 import 'package:manage_delivery/features/manager_employee/bloc/employee_bloc.dart';
 import 'package:manage_delivery/features/manager_employee/model/employee_response.dart';
 import 'package:manage_delivery/utils/dialog.dart';
+import 'package:manage_delivery/utils/search.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -65,7 +66,13 @@ class _EmployeePageState
               actions: [
                 IconButton(
                     icon: Icon(Icons.search, color: Colors.white),
-                    onPressed: () {})
+                    onPressed: () {
+                      showSearch(
+                          context: context,
+                          delegate: CustomSearchDelegate(callbackFind: (value) {
+                            bloc.add(FindShipper(value));
+                          }));
+                    })
               ],
             ),
             body: _buildBody(),
@@ -185,25 +192,6 @@ class _EmployeePageState
                         ),
                 ),
               ),
-              // Container(
-              //   height: 60,
-              //   width: 60,
-              //   decoration: BoxDecoration(
-              //       shape: BoxShape.circle,
-              //       image: DecorationImage(
-              //           image: employees[index].avatarUrl.isNotEmpty
-              //               ? Image.network(
-              //                   AppConst.baseImageUrl +
-              //                       employees[index].avatarUrl,
-              //                   height: double.infinity,
-              //                   width: double.infinity,
-              //                   fit: BoxFit.cover,
-              //                 ).image
-              //               : Image.asset(
-              //                   'assets/images/no_avatar.png',
-              //                   fit: BoxFit.cover,
-              //                 ).image)),
-              // ),
               SizedBox(
                 width: 10,
               ),

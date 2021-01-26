@@ -25,4 +25,19 @@ class CustomerRepository {
         queryParams: {'_id': id});
     return ProductCusResponse.fromJson(res);
   }
+
+  Future<CustomerResponse> getCustomerByArea(int areaId) async {
+    var res = await _baseRequest.sendRequest(
+        AppConst.getCustomerByAreaUrl, RequestMethod.GET,
+        queryParams: {'area': areaId});
+    return CustomerResponse.fromJson(res);
+  }
+
+  Future<FindResponse> findProductByCustomer(
+      String customerId, int productId) async {
+    var res = await _baseRequest.sendRequest(
+        AppConst.findOneProductUrl, RequestMethod.GET,
+        queryParams: {'id': productId, 'customerId': customerId});
+    return FindResponse.fromJson(res);
+  }
 }

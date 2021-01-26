@@ -9,6 +9,8 @@ import 'package:manage_delivery/features/manager_customer/detail_customer/bloc/d
 import 'package:manage_delivery/features/manager_customer/model/customer_response.dart';
 import 'package:manage_delivery/features/manager_product/model/product_response.dart';
 import 'package:manage_delivery/utils/convert_value.dart';
+import 'package:manage_delivery/utils/dialog.dart';
+import 'package:manage_delivery/utils/search.dart';
 import 'package:manage_delivery/utils/status_product.dart';
 
 class DetailCustomerPage extends StatefulWidget {
@@ -56,8 +58,13 @@ class _DetailCustomerPageState
             totalGetting = state.totalGetting;
             totalShipping = state.totalShipping;
             totalShiped = state.totalShiped;
+          } else if (state is FindSuccess) {
+            isShowLoading = false;
+            products.clear();
+            products.add(state.product);
           } else if (state is Error) {
             isShowLoading = false;
+            ShowDialog(context).showNotification(state.message);
           }
         },
         builder: (context, state) {
@@ -72,7 +79,23 @@ class _DetailCustomerPageState
                 },
               ),
               title: Text('Thông tin khách hàng'),
-              actions: [IconButton(icon: Icon(Icons.search), onPressed: () {})],
+              actions: [
+                IconButton(
+                    icon: Icon(Icons.search),
+                    onPressed: () {
+                      showSearch(
+                          context: context,
+                          delegate: CustomSearchDelegate(callbackFind: (value) {
+                            int productId = convertStringToId(value);
+                            if (productId == null) {
+                              ShowDialog(context)
+                                  .showNotification('Mã đơn hàng không hợp lệ');
+                            } else {
+                              bloc.add(FindProduct(productId, customer.id));
+                            }
+                          }));
+                    })
+              ],
             ),
             body: _buildBody(),
           ));

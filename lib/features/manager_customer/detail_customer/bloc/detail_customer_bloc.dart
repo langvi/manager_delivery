@@ -30,6 +30,20 @@ class DetailCustomerBloc
       } else {
         yield Error();
       }
+    } else if (event is FindProduct) {
+      yield* _findProduct(event);
+    }
+  }
+
+  Stream<DetailCustomerState> _findProduct(FindProduct event) async* {
+    yield Loading();
+    final _cusRepository = CustomerRepository();
+    var res = await _cusRepository.findProductByCustomer(
+        event.customerId, event.productId);
+    if (res.isSuccess) {
+      yield FindSuccess(res.product);
+    } else {
+      yield Error(message: res.message);
     }
   }
 }

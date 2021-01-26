@@ -39,6 +39,37 @@ String convertToId(int id) {
   return productId + id.toString();
 }
 
+int convertStringToId(String id) {
+  if (id.length != 7) {
+    return null;
+  }
+  try {
+    int productId = int.parse(id);
+    return productId;
+  } catch (e) {
+    return null;
+  }
+}
+
+int convertNameToAreaId(String name) {
+  switch (name) {
+    case 'Đống Đa':
+      return 1;
+    case 'Thanh Xuân':
+      return 2;
+    case 'Nam Từ Liêm':
+      return 3;
+    case 'Cầu Giấy':
+      return 4;
+    case 'Hai Bà Trưng':
+      return 5;
+    case 'Hoàng Mai':
+      return 6;
+    default:
+      return 0;
+  }
+}
+
 List<String> getDateFromDropDown(String date) {
   List<String> listDate = [];
   if (date == 'Hôm nay') {

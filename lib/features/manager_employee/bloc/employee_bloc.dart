@@ -41,6 +41,11 @@ class EmployeeBloc extends BaseBloc<EmployeeEvent, EmployeeState> {
     }
     var res = await _employeeRepo.getEmployees(pageIndex: pageIndex);
     if (res.isSuccess) {
+      if (res.data.employees.isEmpty) {
+        if (pageIndex > 0) {
+          pageIndex--;
+        }
+      }
       yield GetEmployeeSuccess(res.data.employees, res.data.totalShipper,
           isLoadMore: event.isLoadMore);
     } else {

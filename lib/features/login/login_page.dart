@@ -58,94 +58,99 @@ class _LoginPageState extends BaseStatefulWidgetState<LoginPage, LoginBloc> {
   Widget _buildBody() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            height: 40,
-          ),
-          Container(
-            child: Center(child: Image.asset('assets/images/logo_app.png')),
-            // child: Image.asset('assets/images/logo_login.png'),
-          ),
-          Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: BuildTextInput(
-                    hintText: 'Tên đăng nhập',
-                    iconNextTextInputAction: TextInputAction.next,
-                    controller: userNameController,
-                    filledColor: Colors.grey[300],
-                    currentNode: _userNameFocus,
-                    nextNode: _passwordFocus,
-                    validator: (value) {
-                      if (isStringEmpty(value)) {
-                        return 'Tên đăng nhập không được để trống';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: BuildTextInput(
-                    obscureText: true,
-                    hintText: 'Mật khẩu',
-                    controller: passwordController,
-                    filledColor: Colors.grey[300],
-                    currentNode: _passwordFocus,
-                    iconNextTextInputAction: TextInputAction.done,
-                    validator: (value) {
-                      if (isInvalidTextInput(
-                          value, CheckValidation.PASSWORD)) {
-                        return 'Mật khẩu tối thiểu 6 kí tự';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                // Align(
-                //   alignment: Alignment.centerRight,
-                //   child: InkWell(
-                //       onTap: () {
-                //         // Navigator.pushNamed(
-                //         //     context, AppConst.routeForgotPassword);
-                //       },
-                //       child: Text(
-                //         'Quên mật khẩu',
-                //         style: TextStyle(
-                //             decoration: TextDecoration.underline,
-                //             color: Colors.blue),
-                //       )),
-                // ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 50, bottom: 10),
-                  child: Container(
-                      width: double.infinity,
-                      height: 50,
-                      child: RaisedButton(
-                        color: AppColors.mainColor,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        onPressed: () {
-                          if (_formKey.currentState.validate()) {
-                            bloc.add(Login(userNameController.text.trim(),
-                                passwordController.text.trim()));
+      child: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // SizedBox(
+              //   height: 40,
+              // ),
+              Container(
+                child: Center(child: Image.asset('assets/images/logo_app.png')),
+                // child: Image.asset('assets/images/logo_login.png'),
+              ),
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: BuildTextInput(
+                        hintText: 'Tên đăng nhập',
+                        iconNextTextInputAction: TextInputAction.next,
+                        controller: userNameController,
+                        filledColor: Colors.grey[300],
+                        currentNode: _userNameFocus,
+                        nextNode: _passwordFocus,
+                        validator: (value) {
+                          if (isStringEmpty(value)) {
+                            return 'Tên đăng nhập không được để trống';
                           }
+                          return null;
                         },
-                        child: Text(
-                          'Đăng nhập'.toUpperCase(),
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      )),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: BuildTextInput(
+                        obscureText: true,
+                        hintText: 'Mật khẩu',
+                        controller: passwordController,
+                        filledColor: Colors.grey[300],
+                        currentNode: _passwordFocus,
+                        iconNextTextInputAction: TextInputAction.done,
+                        validator: (value) {
+                          if (isInvalidTextInput(
+                              value, CheckValidation.PASSWORD)) {
+                            return 'Mật khẩu tối thiểu 6 kí tự';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    // Align(
+                    //   alignment: Alignment.centerRight,
+                    //   child: InkWell(
+                    //       onTap: () {
+                    //         // Navigator.pushNamed(
+                    //         //     context, AppConst.routeForgotPassword);
+                    //       },
+                    //       child: Text(
+                    //         'Quên mật khẩu',
+                    //         style: TextStyle(
+                    //             decoration: TextDecoration.underline,
+                    //             color: Colors.blue),
+                    //       )),
+                    // ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 50, bottom: 10),
+                      child: Container(
+                          width: double.infinity,
+                          height: 50,
+                          child: RaisedButton(
+                            color: AppColors.mainColor,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            onPressed: () {
+                              if (_formKey.currentState.validate()) {
+                                bloc.add(Login(userNameController.text.trim(),
+                                    passwordController.text.trim()));
+                              }
+                            },
+                            child: Text(
+                              'Đăng nhập'.toUpperCase(),
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 16),
+                            ),
+                          )),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

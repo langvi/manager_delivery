@@ -11,7 +11,6 @@ import 'package:manage_delivery/features/manager_product/model/product_response.
 import 'package:manage_delivery/utils/convert_value.dart';
 import 'package:manage_delivery/utils/dialog.dart';
 import 'package:manage_delivery/utils/dropdown_widget.dart';
-import 'package:manage_delivery/utils/input_text.dart';
 import 'package:manage_delivery/utils/search.dart';
 import 'package:manage_delivery/utils/status_product.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -239,8 +238,7 @@ class _ProductPageState
         bloc.add(GetAllProduct(isLoadMore: true, type: currentType));
       },
       onRefresh: () {
-        bloc.add(GetAllProduct(isRefresh: true, type: currentType));
-        bloc.add(GetInforProduct(isRefresh: true));
+        refreshPage();
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -379,7 +377,7 @@ class _ProductPageState
       if (value == 1) {
         Navigator.pushNamed(context, AppConst.routeEnterProduct);
       } else {
-        Navigator.pushNamed(context, AppConst.routeCreateProduct);
+        createProduct();
       }
     }, itemBuilder: (context) {
       var list = List<PopupMenuEntry<Object>>();
@@ -433,7 +431,6 @@ class _ProductPageState
     switch (type) {
       case 'Tất cả':
         currentType = 0;
-
         break;
       case 'Lấy hàng':
         currentType = 1;
@@ -446,5 +443,17 @@ class _ProductPageState
         break;
       default:
     }
+  }
+
+  void createProduct() async {
+    await Navigator.pushNamed(context, AppConst.routeCreateProduct);
+    refreshPage();
+    currentValue = 'Tất cả';
+    currentType = 0;
+  }
+
+  void refreshPage() {
+    bloc.add(GetAllProduct(isRefresh: true, type: currentType));
+    bloc.add(GetInforProduct(isRefresh: true));
   }
 }

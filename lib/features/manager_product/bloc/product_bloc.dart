@@ -47,6 +47,11 @@ class ProductBloc extends BaseBloc<ProductEvent, ProductState> {
     var response = await _productRepository.getProducts(
         pageIndex: pageIndex, type: event.type);
     if (response.isSuccess) {
+      if (response.data.isEmpty && event.isLoadMore) {
+        if (pageIndex > 0) {
+          pageIndex--;
+        }
+      }
       yield event.isLoadMore
           ? GetMoreProductSuccess(response.data)
           : GetAllProductSuccess(response.data);

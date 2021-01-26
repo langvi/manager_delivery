@@ -7,6 +7,7 @@ import 'package:manage_delivery/base/view/base_staful_widget.dart';
 import 'package:manage_delivery/base/view/base_widget.dart';
 import 'package:manage_delivery/features/manager_customer/bloc/customer_bloc.dart';
 import 'package:manage_delivery/features/manager_customer/model/customer_response.dart';
+import 'package:manage_delivery/utils/convert_value.dart';
 import 'package:manage_delivery/utils/dialog.dart';
 import 'package:manage_delivery/utils/search.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -29,7 +30,15 @@ class _CustomerPageState
   String currentValue = '';
   int totalCustomer = 0;
   List<Customer> customers = [];
-  List<String> values = ['Tất cả', 'Đống Đa', 'Thanh Xuân'];
+  List<String> values = [
+    'Tất cả',
+    'Đống Đa',
+    'Thanh Xuân',
+    'Nam Từ Liêm',
+    'Cầu Giấy',
+    'Hai Bà Trưng',
+    'Hoàng Mai'
+  ];
   @override
   void initBloc() {
     bloc = CustomerBloc();
@@ -112,6 +121,9 @@ class _CustomerPageState
                                             delegate: CustomSearchDelegate(
                                                 callbackFind: (value) {
                                               bloc.add(FindCustomer(value));
+                                              setState(() {
+                                                currentValue = '';
+                                              });
                                             }));
                                       }),
                                 ],
@@ -159,43 +171,49 @@ class _CustomerPageState
                                           ]),
                                     ),
                                     Spacer(),
-                                    Container(
-                                        height: 30,
-                                        width: 100,
-                                        child: DropdownButton<String>(
-                                          isExpanded: true,
-                                          hint: Text(
-                                            'Chọn khu vực',
-                                            style: TextStyle(
-                                                color: Colors.grey,
-                                                fontSize: 12),
-                                          ),
-                                          underline: Container(),
-                                          value: currentValue.isEmpty
-                                              ? null
-                                              : currentValue,
-                                          dropdownColor: AppColors.mainColor,
-                                          style: TextStyle(color: Colors.white),
-                                          iconEnabledColor: Colors.white,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              currentValue = value;
-                                            });
-                                          },
-                                          items: values
-                                              .map<DropdownMenuItem<String>>(
-                                                  (String value) {
-                                            return DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Text(
-                                                value,
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.white),
-                                              ),
-                                            );
-                                          }).toList(),
-                                        ))
+                                    Expanded(
+                                      flex: 2,
+                                      child: Container(
+                                          height: 40,
+                                          child: DropdownButton<String>(
+                                            isExpanded: true,
+                                            hint: Text(
+                                              'Chọn khu vực',
+                                              style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 12),
+                                            ),
+                                            underline: Container(),
+                                            value: currentValue.isEmpty
+                                                ? null
+                                                : currentValue,
+                                            dropdownColor: AppColors.mainColor,
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                            iconEnabledColor: Colors.white,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                currentValue = value;
+                                              });
+                                              bloc.add(GetCustomerArea(
+                                                  convertNameToAreaId(
+                                                      currentValue)));
+                                            },
+                                            items: values
+                                                .map<DropdownMenuItem<String>>(
+                                                    (String value) {
+                                              return DropdownMenuItem<String>(
+                                                value: value,
+                                                child: Text(
+                                                  value,
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.white),
+                                                ),
+                                              );
+                                            }).toList(),
+                                          )),
+                                    )
                                   ],
                                 ),
                               ),

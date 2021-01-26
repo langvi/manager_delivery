@@ -28,6 +28,8 @@ class CustomerBloc extends BaseBloc<CustomerEvent, CustomerState> {
       yield* _getCustomer(event);
     } else if (event is FindCustomer) {
       yield* _findCustomer(event);
+    } else if (event is GetCustomerArea) {
+      yield* _getCustomerArea(event);
     }
   }
 
@@ -51,6 +53,16 @@ class CustomerBloc extends BaseBloc<CustomerEvent, CustomerState> {
   Stream<CustomerState> _findCustomer(FindCustomer event) async* {
     yield Loading();
     var res = await _customerRepo.findCustomer(event.keySearch);
+    if (res.isSuccess) {
+      yield GetCustomerSuccess(res.data.customer, res.data.totalCustomer);
+    } else {
+      yield Error('Lỗi');
+    }
+  }
+
+  Stream<CustomerState> _getCustomerArea(GetCustomerArea event) async* {
+    yield Loading();
+    var res = await _customerRepo.getCustomerByArea(event.areaId);
     if (res.isSuccess) {
       yield GetCustomerSuccess(res.data.customer, res.data.totalCustomer);
     } else {

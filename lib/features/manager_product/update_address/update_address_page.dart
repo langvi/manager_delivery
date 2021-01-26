@@ -4,6 +4,7 @@ import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/view/base_staful_widget.dart';
 import 'package:manage_delivery/features/manager_product/model/product_response.dart';
 import 'package:manage_delivery/features/manager_product/update_address/bloc/update_address_bloc.dart';
+import 'package:manage_delivery/utils/address.dart';
 import 'package:manage_delivery/utils/dialog.dart';
 import 'package:manage_delivery/utils/input_text.dart';
 import 'package:manage_delivery/utils/style_text.dart';
@@ -18,12 +19,20 @@ class UpdateAddressPage extends StatefulWidget {
 
 class _UpdateAddressPageState
     extends BaseStatefulWidgetState<UpdateAddressPage, UpdateAddressBloc> {
-  TextEditingController nameReceiveController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController detailAddressCtr = TextEditingController();
   final _nameFocus = FocusNode();
   final _phoneFocus = FocusNode();
   String title = 'Thêm địa chỉ người';
+  List<String> districs = [
+    'Đống Đa',
+    'Thanh Xuân',
+    'Nam Từ Liêm',
+    'Cầu Giấy',
+    'Hai Bà Trưng',
+    'Hoàng Mai',
+  ];
   String enterName = 'Nhập tên người';
   String currentProvince;
   String currentDistrict;
@@ -41,9 +50,12 @@ class _UpdateAddressPageState
   void didChangeDependencies() {
     if (product == null) {
       product = ModalRoute.of(context).settings.arguments;
-      nameReceiveController.text = product.sendFrom;
+      nameController.text = product.sendFrom;
       phoneController.text = product.phoneSend;
       detailAddressCtr.text = getAddressUpdate(product.addressSend);
+      currentProvince = 'Hà Nội';
+      currentDistrict = getDistrict(product.addressSend);
+      currentVillage = getVillage(product.addressSend);
     }
     super.didChangeDependencies();
   }
@@ -107,7 +119,7 @@ class _UpdateAddressPageState
               padding: const EdgeInsets.symmetric(vertical: 5),
               child: BuildTextInput(
                 hintText: getTitle(enterName),
-                controller: nameReceiveController,
+                controller: nameController,
                 currentNode: _nameFocus,
                 nextNode: _phoneFocus,
                 isBorder: true,
@@ -147,13 +159,13 @@ class _UpdateAddressPageState
                   width: 10,
                 ),
                 Expanded(
-                    child: _buildDropDown(
-                        'Chọn quận(huyện)', ['Hai Bà Trưng'], 1)),
+                    child: _buildDropDown('Chọn quận(huyện)', districs, 1)),
               ],
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
-              child: _buildDropDown('Chọn phường(xã)', ['Bách Khoa'], 2),
+              child: _buildDropDown('Chọn phường(xã)',
+                  Address.fromJson(currentDistrict).villages, 2),
             ),
             TextFormField(
               controller: detailAddressCtr,
@@ -198,6 +210,7 @@ class _UpdateAddressPageState
                 break;
               case 1:
                 currentDistrict = newValue;
+                currentVillage = null;
                 break;
               case 2:
                 currentVillage = newValue;
@@ -233,16 +246,20 @@ class _UpdateAddressPageState
                 if (isSend) {
                   product.addressSend = getAddress();
                   product.phoneSend = phoneController.text;
-                  product.sendFrom = nameReceiveController.text;
+                  product.sendFrom = nameController.text;
+                  nameController.text = product.receiveBy;
+                  phoneController.text = product.phoneReceive;
+                  detailAddressCtr.text =
+                      getAddressUpdate(product.addressReceive);
                 } else {
                   product.addressReceive = getAddress();
                   product.phoneReceive = phoneController.text;
-                  product.receiveBy = nameReceiveController.text;
+                  product.receiveBy = nameController.text;
                   bloc.add(UpdateProduct(product));
                 }
                 setState(() {
                   isSend = false;
-                  nameReceiveController.text = product.receiveBy;
+                  nameController.text = product.receiveBy;
                   phoneController.text = product.phoneReceive;
                   detailAddressCtr.text = product.addressReceive;
                 });
@@ -307,5 +324,15 @@ class _UpdateAddressPageState
 
   String getTitle(String content) {
     return isSend ? content + ' gửi' : content + ' nhận';
+  }
+
+  String getDistrict(String address) {
+    var listAddress = address.split(',');
+    return listAddress.elementAt(listAddress.length - 2).trim();
+  }
+
+  String getVillage(String address) {
+    var listAddress = address.split(',');
+    return listAddress.elementAt(listAddress.length - 3).trim();
   }
 }
