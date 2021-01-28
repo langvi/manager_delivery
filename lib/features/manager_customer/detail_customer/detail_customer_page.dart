@@ -7,6 +7,7 @@ import 'package:manage_delivery/base/consts/const.dart';
 import 'package:manage_delivery/base/view/base_staful_widget.dart';
 import 'package:manage_delivery/features/manager_customer/detail_customer/bloc/detail_customer_bloc.dart';
 import 'package:manage_delivery/features/manager_customer/model/customer_response.dart';
+import 'package:manage_delivery/features/manager_product/model/infor_response.dart';
 import 'package:manage_delivery/features/manager_product/model/product_response.dart';
 import 'package:manage_delivery/utils/convert_value.dart';
 import 'package:manage_delivery/utils/dialog.dart';
@@ -214,9 +215,11 @@ class _DetailCustomerPageState
                 SizedBox(
                   width: 10,
                 ),
-                Text(
-                  customer.address,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                Expanded(
+                  child: Text(
+                    customer.address,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
                 )
               ],
             ),
@@ -279,7 +282,13 @@ class _DetailCustomerPageState
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, AppConst.routeDetailProduct);
+          Navigator.pushNamed(context, AppConst.routeDetailProduct, arguments: {
+            'product': products[index],
+            'inforCus': CustomerProduct(
+                address: customer.address,
+                name: customer.name,
+                phone: customer.phoneNumber)
+          });
         },
         child: Container(
           padding: EdgeInsets.all(10),
@@ -289,7 +298,9 @@ class _DetailCustomerPageState
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
                       gradient: LinearGradient(
-                          colors: [Colors.blue[700], Colors.blue[300]]),
+                          colors: getGradient(
+                        products[index].status,
+                      )),
                       shape: BoxShape.circle),
                   child: SvgPicture.asset(
                     'assets/images/product.svg',

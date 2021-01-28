@@ -70,7 +70,11 @@ class _UpdateAddressPageState
             isShowLoading = true;
           } else if (state is Success) {
             isShowLoading = false;
-            ShowDialog(context).showNotification('Cập nhật thành công');
+            ShowDialog(context).showNotification('Cập nhật thành công',
+                functionCloseDialog: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            });
           } else if (state is Error) {
             isShowLoading = false;
           }
@@ -261,7 +265,7 @@ class _UpdateAddressPageState
                   isSend = false;
                   nameController.text = product.receiveBy;
                   phoneController.text = product.phoneReceive;
-                  detailAddressCtr.text = product.addressReceive;
+                  // detailAddressCtr.text = product.addressReceive;
                 });
               }
             }

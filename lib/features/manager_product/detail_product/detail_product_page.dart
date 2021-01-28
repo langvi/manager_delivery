@@ -67,13 +67,14 @@ class _DetailProductPageState
             Divider(
               thickness: 2,
             ),
-            _buildSend(
-                true, product.sendFrom, product.phoneSend, product.addressSend),
+            // dia chi giao hang
+            _buildSend(true, product.receiveBy, product.phoneReceive,
+                product.addressReceive),
             Divider(
               thickness: 2,
             ),
-            _buildSend(false, product.receiveBy, product.phoneReceive,
-                product.addressReceive),
+            _buildSend(false, product.sendFrom, product.phoneSend,
+                product.addressSend),
             Divider(
               thickness: 2,
             ),
@@ -291,7 +292,7 @@ class _DetailProductPageState
   }
 
   Widget _getTimeShipped(int status) {
-    if (status == 4) {
+    if (status == 6) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -305,19 +306,22 @@ class _DetailProductPageState
     } else {
       return Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Thời gian lấy:'),
-              Text(
-                convertDateTimeToString(product.shippingAt),
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 10,
-          ),
+          // Visibility(
+          //   visible: status > 3,
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: [
+          //       Text('Thời gian tạo:'),
+          //       Text(
+          //         convertDateTimeToString(product.createdAt),
+          //         style: TextStyle(fontWeight: FontWeight.bold),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          // SizedBox(
+          //   height: 10,
+          // ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -360,10 +364,6 @@ class _DetailProductPageState
           Navigator.pushNamed(context, AppConst.routeUpdateProduct,
               arguments: product);
         }
-      } else {
-        if (product.status != 2) {
-          print('Xóa');
-        }
       }
     }, itemBuilder: (context) {
       var list = List<PopupMenuEntry<Object>>();
@@ -380,31 +380,6 @@ class _DetailProductPageState
                 width: 5,
               ),
               Text("Cập nhật đơn hàng"),
-            ],
-          ),
-        ),
-      );
-      list.add(
-        PopupMenuDivider(
-          height: 10,
-        ),
-      );
-      list.add(
-        PopupMenuItem(
-          value: 2,
-          child: Row(
-            children: [
-              Icon(
-                Icons.delete,
-                color: Colors.red,
-              ),
-              SizedBox(
-                width: 5,
-              ),
-              Text(
-                "Xóa đơn hàng",
-                style: TextStyle(color: Colors.red),
-              ),
             ],
           ),
         ),

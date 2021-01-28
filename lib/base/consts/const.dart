@@ -9,7 +9,7 @@ class AppConst {
   static const String routeUpdateProduct = '/updateProduct';
   static const String routeUpdateAddress = '/updateAddress';
   // static const String baseUrl = 'http://192.168.0.105:8080/api';
-  static const String baseUrl = 'http://192.168.31.213:8080/api';
+  static const String baseUrl = 'http://192.168.31.210:8080/api';
   // static const String baseUrl = 'http://127.0.0.1:8080/api';
   // static const String baseUrl = 'http://localhost:8080/api';
   static const String loginUrl = '/login';
@@ -30,7 +30,7 @@ class AppConst {
   static const String getProductByEmployeeUrl = '/productByTime';
   static const String findEmployeeUrl = '/findEmployee';
   static const String getCountProductByTimeUrl = '/getInforProductByTime';
-  static const String baseImageUrl = 'http://192.168.31.213:8080';
+  static const String baseImageUrl = 'http://192.168.31.210:8080';
 
   // prefs
   static const String keyToken = 'key_token';

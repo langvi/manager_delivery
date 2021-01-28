@@ -121,7 +121,7 @@ class _EnterProductPageState
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, AppConst.routeDetailProduct);
+          // Navigator.pushNamed(context, AppConst.routeDetailProduct);
         },
         child: Container(
           padding: EdgeInsets.all(10),

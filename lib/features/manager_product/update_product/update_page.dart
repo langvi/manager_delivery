@@ -6,6 +6,7 @@ import 'package:manage_delivery/base/consts/colors.dart';
 import 'package:manage_delivery/base/consts/const.dart';
 import 'package:manage_delivery/features/manager_product/model/product_response.dart';
 import 'package:manage_delivery/features/manager_product/update_product/bloc/update_bloc.dart';
+import 'package:manage_delivery/utils/dialog.dart';
 
 import '../../../base/view/base_staful_widget.dart';
 import '../../../utils/input_text.dart';
@@ -38,7 +39,7 @@ class _UpdatePageState extends BaseStatefulWidgetState<UpdatePage, UpdateBloc> {
     if (product == null) {
       product = ModalRoute.of(context).settings.arguments;
       nameController = TextEditingController(text: product.nameProduct);
-      costController = MoneyMaskedTextController( 
+      costController = MoneyMaskedTextController(
           initialValue: product.costShip.toDouble(),
           precision: 0,
           decimalSeparator: '');
@@ -57,24 +58,37 @@ class _UpdatePageState extends BaseStatefulWidgetState<UpdatePage, UpdateBloc> {
     return BlocProvider<UpdateBloc>(
       create: (context) => bloc,
       child: BlocConsumer<UpdateBloc, UpdateState>(
-        listener: (context, state) {},
+        listener: (context, state) {
+          if (state is Loading) {
+            isShowLoading = true;
+          } else if (state is UpdateSuccess) {
+            isShowLoading = false;
+            ShowDialog(context).showNotification('Cập nhật thành công',
+                functionCloseDialog: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            });
+          }
+        },
         builder: (context, state) {
-          return Scaffold(
-            appBar: AppBar(
-              backgroundColor: AppColors.mainColor,
-              elevation: 0,
-              leading: BackButton(
-                color: Colors.white,
-                onPressed: () => Navigator.pop(context),
+          return baseShowLoading(
+            child: Scaffold(
+              appBar: AppBar(
+                backgroundColor: AppColors.mainColor,
+                elevation: 0,
+                leading: BackButton(
+                  color: Colors.white,
+                  onPressed: () => Navigator.pop(context),
+                ),
+                title: Text(
+                  'Tạo đơn hàng',
+                  style: TextStyle(color: Colors.white),
+                ),
+                centerTitle: true,
               ),
-              title: Text(
-                'Tạo đơn hàng',
-                style: TextStyle(color: Colors.white),
+              body: Column(
+                children: [Expanded(child: _buildBody()), _buildButton()],
               ),
-              centerTitle: true,
-            ),
-            body: Column(
-              children: [Expanded(child: _buildBody()), _buildButton()],
             ),
           );
         },

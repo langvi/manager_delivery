@@ -27,20 +27,6 @@ String getStatusOfProduct(int statusShip) {
       break;
     default:
   }
-  // if (statusShip == 0) {
-  //   if (isSuccess && !isEnter) {
-  //     title = 'Lấy thành công';
-  //   } else if (!isSuccess && !isEnter) {
-  //     title = 'Lấy thất bại';
-  //   }
-  // } else if (statusShip == 1) {
-  //   title = 'Đang giao';
-  //   if (isSuccess && !isEnter) {
-  //     title = 'Đã giao';
-  //   } else if (!isSuccess && !isEnter) {
-  //     title = 'Giao thất bại';
-  //   }
-  // }
   return title;
 }
 
@@ -59,31 +45,7 @@ List<Color> getGradient(int type) {
     default:
   }
   return AppColors.gradientShipped;
-  // if (type == 1 && !isSuccess) {
-  //   return AppColors.gradientShipping;
-  // } else if (type == 1 && isSuccess) {
-  //   return AppColors.gradientShipped;
-  // }
-  // return AppColors.gradientGetProduct;
 }
-
-// Color getColor(int status) {
-//   Color color = Colors.orange;
-//   if (statusShip == 0) {
-//     color = Colors.orange;
-//     if (!isSuccess && !isEnter) {
-//       color = Colors.red;
-//     }
-//   } else if (statusShip == 1) {
-//     color = Colors.green;
-//     if (isSuccess && !isEnter) {
-//       color = Colors.blue;
-//     } else if (!isSuccess && !isEnter) {
-//       color = Colors.red;
-//     }
-//   }
-//   return color;
-// }
 Color getColor(int status) {
   Color color = Colors.orange;
   switch (status) {
